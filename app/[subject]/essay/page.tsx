@@ -4,6 +4,7 @@ import { getSubject } from "@/lib/subjects";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
+import { BottomNav } from "@/components/ui/bottom-nav";
 import type { Subject } from "@/lib/subjects";
 
 interface CategoryScore {
@@ -279,6 +280,7 @@ export default function EssayPage() {
           </div>
         )}
       </div>
+      <BottomNav />
     </main>
   );
 }

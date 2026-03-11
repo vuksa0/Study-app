@@ -5,6 +5,7 @@ import type { Subject, Topic } from "@/lib/subjects";
 import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
 import { useState, useEffect, useRef, Suspense, useCallback } from "react";
+import { BottomNav } from "@/components/ui/bottom-nav";
 
 interface CodingProblem {
   title: string;
@@ -441,6 +442,7 @@ function CodingContent() {
           </div>
         )}
       </div>
+      <BottomNav />
     </main>
   );
 }

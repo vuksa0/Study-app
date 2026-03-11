@@ -7,6 +7,7 @@ import { getTestDate } from "@/lib/test-date";
 import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
 import { useState, useEffect, Suspense } from "react";
+import { BottomNav } from "@/components/ui/bottom-nav";
 
 interface Question {
   question: string;
@@ -16,6 +17,7 @@ interface Question {
 }
 
 const COUNT_OPTIONS = [5, 10, 15, 20];
+const OPTION_LABELS = ["A", "B", "C", "D"];
 
 function QuizContent() {
   const params = useParams();
@@ -48,23 +50,36 @@ function QuizContent() {
   const [selected, setSelected] = useState<number | null>(null);
   const [revealed, setRevealed] = useState(false);
   const [score, setScore] = useState(0);
+  const [streak, setStreak] = useState(0);
+  const [maxStreak, setMaxStreak] = useState(0);
+  const [currentStreak, setCurrentStreak] = useState(0);
   const [finished, setFinished] = useState(false);
   const [started, setStarted] = useState(false);
+  const [showHint, setShowHint] = useState(false);
 
   async function generateQuiz() {
     if (!subject) return;
     setLoading(true);
     setError("");
+    setShowHint(false);
     try {
       const res = await fetch("/api/generate-quiz", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ subjectId, topicId, count, subjectName: subject.name, topicName: topic?.name, topicDescription: topic?.description, testDate: getTestDate(subjectId) }),
+        body: JSON.stringify({
+          subjectId, topicId, count,
+          subjectName: subject.name,
+          topicName: topic?.name,
+          topicDescription: topic?.description,
+          testDate: getTestDate(subjectId),
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Error generating quiz");
       setQuestions(data.questions);
-      setCurrent(0); setSelected(null); setRevealed(false); setScore(0); setFinished(false); setStarted(true);
+      setCurrent(0); setSelected(null); setRevealed(false);
+      setScore(0); setStreak(0); setMaxStreak(0); setCurrentStreak(0);
+      setFinished(false); setStarted(true);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Something went wrong");
     } finally {
@@ -76,180 +91,372 @@ function QuizContent() {
     if (revealed) return;
     setSelected(idx);
     setRevealed(true);
-    if (idx === questions[current].answer) setScore((s) => s + 1);
+    setShowHint(false);
+    if (idx === questions[current].answer) {
+      setScore((s) => s + 1);
+      setCurrentStreak((s) => {
+        const next = s + 1;
+        setMaxStreak((m) => Math.max(m, next));
+        return next;
+      });
+    } else {
+      setCurrentStreak(0);
+    }
   }
 
   function next() {
-    if (current + 1 >= questions.length) setFinished(true);
-    else { setCurrent((c) => c + 1); setSelected(null); setRevealed(false); }
+    if (current + 1 >= questions.length) {
+      setStreak(maxStreak);
+      setFinished(true);
+    } else {
+      setCurrent((c) => c + 1);
+      setSelected(null);
+      setRevealed(false);
+      setShowHint(false);
+    }
   }
 
   if (!subject) return null;
 
   const q = questions[current];
   const percentage = questions.length > 0 ? Math.round((score / questions.length) * 100) : 0;
+  const progressPct = questions.length > 0 ? ((current / questions.length) * 100) : 0;
+
+  // Circular SVG for results
+  const RADIUS = 88;
+  const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
+  const offset = CIRCUMFERENCE - (percentage / 100) * CIRCUMFERENCE;
 
   return (
-    <main className="relative min-h-screen">
-      <div className="dot-grid absolute inset-0 pointer-events-none opacity-30" />
+    <div className="bg-[#151022] text-slate-100 min-h-screen relative overflow-x-hidden font-sans">
+      {/* Background */}
+      <div className="fixed inset-0 dot-grid pointer-events-none" />
+      <div className="fixed top-[-10%] left-[-10%] w-[50%] h-[50%] orb-glow pointer-events-none" />
+      <div className="fixed bottom-[-10%] right-[-10%] w-[60%] h-[60%] orb-glow pointer-events-none" />
 
-      <div className="relative max-w-xl mx-auto px-5 py-14">
-        <Link href={`/${subjectId}`} className="inline-flex items-center gap-1.5 text-sm mb-10 transition-colors"
-          style={{ color: "rgba(255,255,255,0.35)" }}
-          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.7)"; }}
-          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.35)"; }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M19 12H5M12 5l-7 7 7 7"/>
-          </svg>
-          {subject.name}
-        </Link>
+      <div className="relative z-10 flex flex-col min-h-screen max-w-5xl mx-auto px-8 py-6">
 
-        {/* Setup screen */}
+        {/* Setup Screen */}
         {!started && (
-          <div className="card-glow rounded-2xl p-8 fade-up">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
-                style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}>
-                {subject.emoji}
+          <>
+            <header className="flex items-center justify-between mb-8">
+              <Link
+                href={`/${subjectId}`}
+                className="flex items-center justify-center size-10 rounded-full glass glass-hover transition-all"
+              >
+                <span className="material-symbols-outlined text-slate-100">arrow_back</span>
+              </Link>
+              <div className="text-center">
+                <h2 className="text-slate-100 text-lg font-bold tracking-tight">Quiz Setup</h2>
+                <p className="text-primary text-xs font-medium uppercase tracking-widest">{subject.name}</p>
               </div>
-              <div>
-                <h1 className="font-semibold text-white/90">{subject.name}</h1>
-                <p className="text-sm" style={{ color: "rgba(255,255,255,0.35)" }}>
-                  {topic ? topic.name : "All topics"}
-                </p>
-              </div>
-            </div>
+              <div className="size-10" />
+            </header>
 
-            <div className="mb-6">
-              <p className="text-xs mb-3 font-medium" style={{ color: "rgba(255,255,255,0.35)" }}>NUMBER OF QUESTIONS</p>
-              <div className="flex gap-2">
+            <div className="glass rounded-xl p-8 fade-up">
+              <div className="flex items-center gap-3 mb-8">
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-primary/20 border border-primary/30">
+                  <span className="material-symbols-outlined text-primary">quiz</span>
+                </div>
+                <div>
+                  <h1 className="font-bold text-white">{subject.name}</h1>
+                  <p className="text-sm text-slate-400">{topic ? topic.name : "All topics"}</p>
+                </div>
+              </div>
+
+              <p className="text-xs mb-3 font-bold uppercase tracking-widest text-slate-400">Number of Questions</p>
+              <div className="flex gap-2 mb-8">
                 {COUNT_OPTIONS.map((n) => (
                   <button key={n} onClick={() => setCount(n)}
-                    className="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all"
+                    className="flex-1 py-3 rounded-xl text-sm font-bold transition-all"
                     style={{
                       border: "1px solid",
-                      borderColor: count === n ? "rgba(139,92,246,0.5)" : "var(--border)",
-                      background: count === n ? "rgba(139,92,246,0.12)" : "transparent",
+                      borderColor: count === n ? "rgba(137,90,246,0.6)" : "rgba(137,90,246,0.2)",
+                      background: count === n ? "rgba(137,90,246,0.15)" : "transparent",
                       color: count === n ? "#c4b5fd" : "rgba(255,255,255,0.4)",
                     }}>
                     {n}
                   </button>
                 ))}
               </div>
+
+              {error && <p className="text-red-400 text-sm mb-4">{error}</p>}
+
+              <button
+                onClick={generateQuiz}
+                disabled={loading}
+                className="w-full py-5 rounded-xl bg-primary text-white font-bold text-lg hover:shadow-[0_0_25px_rgba(137,90,246,0.5)] transition-all flex items-center justify-center gap-2 disabled:opacity-40"
+              >
+                {loading ? (
+                  <>
+                    <svg className="animate-spin" width="18" height="18" viewBox="0 0 24 24" fill="none">
+                      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeDasharray="40" strokeDashoffset="15"/>
+                    </svg>
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    Start Quiz
+                    <span className="material-symbols-outlined leading-none">arrow_forward</span>
+                  </>
+                )}
+              </button>
             </div>
-
-            {error && <p className="text-red-400 text-sm mb-4">{error}</p>}
-
-            <button onClick={generateQuiz} disabled={loading} className="btn-primary w-full">
-              {loading ? (
-                <>
-                  <svg className="animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none">
-                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeDasharray="40" strokeDashoffset="15"/>
-                  </svg>
-                  Generating questions...
-                </>
-              ) : (
-                <>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <polygon points="5 3 19 12 5 21 5 3"/>
-                  </svg>
-                  Start Quiz
-                </>
-              )}
-            </button>
-          </div>
+          </>
         )}
 
-        {/* Quiz screen */}
+        {/* Quiz Screen */}
         {started && !finished && q && (
-          <div>
+          <>
+            <header className="flex items-center justify-between mb-8">
+              <button
+                onClick={() => { setStarted(false); setQuestions([]); }}
+                className="flex items-center justify-center size-10 rounded-full glass glass-hover transition-all"
+              >
+                <span className="material-symbols-outlined text-slate-100">close</span>
+              </button>
+              <div className="text-center">
+                <h2 className="text-slate-100 text-lg font-bold tracking-tight">
+                  Question {current + 1} of {questions.length}
+                </h2>
+                <p className="text-primary text-xs font-medium uppercase tracking-widest">{subject.name} Session</p>
+              </div>
+              <div className="flex items-center justify-center size-10 rounded-full glass">
+                <span className="text-xs font-bold text-primary">{score}</span>
+              </div>
+            </header>
+
             {/* Progress */}
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-medium" style={{ color: "rgba(255,255,255,0.35)" }}>
-                {current + 1} / {questions.length}
-              </span>
-              <span className="text-xs font-semibold" style={{ color: "#a78bfa" }}>
-                {score} correct
-              </span>
-            </div>
-            <div className="w-full h-1 rounded-full mb-8 overflow-hidden" style={{ background: "var(--surface-2)" }}>
-              <div className="h-full rounded-full transition-all duration-500"
-                style={{ width: `${(current / questions.length) * 100}%`, background: "linear-gradient(90deg,#7c3aed,#06b6d4)" }} />
-            </div>
-
-            {/* Question */}
-            <div className="card-glow rounded-2xl p-6 mb-4">
-              <p className="text-base font-medium leading-relaxed text-white/85">{q.question}</p>
+            <div className="flex flex-col gap-2 mb-10">
+              <div className="flex justify-between items-center px-1">
+                <span className="text-xs font-semibold text-primary/80 uppercase">Progress</span>
+                <span className="text-xs font-bold text-slate-100">{Math.round(progressPct)}%</span>
+              </div>
+              <div className="h-1.5 w-full bg-primary/10 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-primary rounded-full shadow-[0_0_10px_rgba(137,90,246,0.5)] transition-all duration-500"
+                  style={{ width: `${progressPct}%` }}
+                />
+              </div>
             </div>
 
-            {/* Options */}
-            <div className="grid gap-2.5 mb-5">
+            {/* Question Card */}
+            <div className="glass rounded-xl p-8 relative overflow-hidden mb-6">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-16 -mt-16" />
+              <div className="relative z-10 flex flex-col items-center text-center">
+                {topic && (
+                  <span className="px-3 py-1 rounded-full bg-primary/20 border border-primary/30 text-primary text-[10px] font-bold uppercase tracking-widest mb-6">
+                    {topic.name}
+                  </span>
+                )}
+                <h1 className="text-2xl md:text-3xl font-bold leading-tight bg-gradient-to-br from-white via-slate-200 to-primary/60 bg-clip-text text-transparent">
+                  {q.question}
+                </h1>
+              </div>
+            </div>
+
+            {/* Hint */}
+            {showHint && !revealed && (
+              <div className="glass rounded-xl p-4 mb-4 text-sm text-slate-300 border border-primary/20">
+                <span className="font-bold text-primary">Hint: </span>
+                {q.explanation}
+              </div>
+            )}
+
+            {/* Answer Options */}
+            <div className="grid grid-cols-1 gap-3 mb-6">
               {q.options.map((opt, idx) => {
                 let bg = "transparent";
-                let borderColor = "var(--border)";
-                let color = "rgba(255,255,255,0.7)";
+                let borderColor = "rgba(137,90,246,0.2)";
+                let color = "rgba(255,255,255,0.85)";
+                let labelBg = "transparent";
+                let labelBorder = "rgba(137,90,246,0.3)";
+                let labelColor = "rgba(255,255,255,0.8)";
+
                 if (revealed) {
-                  if (idx === q.answer) { bg = "rgba(34,197,94,0.08)"; borderColor = "rgba(34,197,94,0.4)"; color = "#86efac"; }
-                  else if (idx === selected) { bg = "rgba(239,68,68,0.08)"; borderColor = "rgba(239,68,68,0.4)"; color = "#fca5a5"; }
-                  else { color = "rgba(255,255,255,0.2)"; }
+                  if (idx === q.answer) {
+                    bg = "rgba(34,197,94,0.12)";
+                    borderColor = "rgba(34,197,94,0.5)";
+                    color = "#86efac";
+                    labelBg = "rgba(34,197,94,0.2)";
+                    labelBorder = "rgba(34,197,94,0.5)";
+                    labelColor = "#86efac";
+                  } else if (idx === selected) {
+                    bg = "rgba(239,68,68,0.12)";
+                    borderColor = "rgba(239,68,68,0.5)";
+                    color = "#fca5a5";
+                    labelBg = "rgba(239,68,68,0.2)";
+                    labelBorder = "rgba(239,68,68,0.5)";
+                    labelColor = "#fca5a5";
+                  } else {
+                    color = "rgba(255,255,255,0.2)";
+                    labelColor = "rgba(255,255,255,0.2)";
+                    labelBorder = "rgba(255,255,255,0.1)";
+                  }
+                } else if (selected === idx) {
+                  bg = "rgba(137,90,246,0.2)";
+                  borderColor = "rgba(137,90,246,0.6)";
                 }
+
                 return (
-                  <button key={idx} onClick={() => handleSelect(idx)} disabled={revealed}
-                    className="w-full text-left px-5 py-3.5 rounded-xl text-sm font-medium transition-all"
-                    style={{ background: bg, border: `1px solid ${borderColor}`, color, cursor: revealed ? "default" : "pointer" }}>
-                    {opt}
+                  <button
+                    key={idx}
+                    onClick={() => handleSelect(idx)}
+                    disabled={revealed}
+                    className="rounded-full px-6 py-4 flex items-center gap-4 transition-all duration-200 text-left"
+                    style={{
+                      background: bg,
+                      border: `1px solid ${borderColor}`,
+                      color,
+                      cursor: revealed ? "default" : "pointer",
+                    }}
+                  >
+                    <span
+                      className="size-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
+                      style={{
+                        background: labelBg,
+                        border: `1px solid ${labelBorder}`,
+                        color: labelColor,
+                      }}
+                    >
+                      {OPTION_LABELS[idx]}
+                    </span>
+                    <span className="font-medium">{opt}</span>
+                    {revealed && idx === q.answer && (
+                      <span className="material-symbols-outlined ml-auto text-green-400 text-xl leading-none">check_circle</span>
+                    )}
+                    {revealed && idx === selected && idx !== q.answer && (
+                      <span className="material-symbols-outlined ml-auto text-red-400 text-xl leading-none">cancel</span>
+                    )}
                   </button>
                 );
               })}
             </div>
 
-            {/* Explanation */}
+            {/* Explanation after reveal */}
             {revealed && (
-              <div className="rounded-xl p-4 mb-5 text-sm" style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}>
-                <span className="font-medium" style={{ color: "rgba(255,255,255,0.35)" }}>Explanation  </span>
-                <span style={{ color: "rgba(255,255,255,0.6)" }}>{q.explanation}</span>
+              <div className="glass rounded-xl p-4 mb-5 text-sm border-primary/20">
+                <span className="font-bold text-primary/70">Explanation  </span>
+                <span className="text-slate-300">{q.explanation}</span>
               </div>
             )}
 
-            {revealed && (
-              <button onClick={next} className="btn-primary w-full">
-                {current + 1 >= questions.length ? "See Results" : "Next Question"}
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path d="M5 12h14M12 5l7 7-7 7"/>
-                </svg>
-              </button>
-            )}
-          </div>
+            {/* Footer actions */}
+            <div className="flex flex-col gap-3">
+              {!revealed && (
+                <button
+                  onClick={() => setShowHint((h) => !h)}
+                  className="w-full py-4 rounded-xl border border-primary/40 text-primary font-bold hover:bg-primary/5 transition-all flex items-center justify-center gap-2"
+                >
+                  <span className="material-symbols-outlined text-xl leading-none">lightbulb</span>
+                  {showHint ? "Hide Hint" : "Hint"}
+                </button>
+              )}
+              {revealed && (
+                <button
+                  onClick={next}
+                  className="w-full py-5 rounded-xl bg-primary text-white font-bold text-lg hover:shadow-[0_0_25px_rgba(137,90,246,0.5)] transition-all flex items-center justify-center gap-2"
+                >
+                  {current + 1 >= questions.length ? "See Results" : "Next Question"}
+                  <span className="material-symbols-outlined leading-none">arrow_forward</span>
+                </button>
+              )}
+            </div>
+          </>
         )}
 
-        {/* Result screen */}
+        {/* Results Screen */}
         {finished && (
-          <div className="card-glow rounded-2xl p-8 text-center fade-up">
-            <div className="text-5xl mb-5">
-              {percentage >= 80 ? "🏆" : percentage >= 60 ? "👍" : percentage >= 40 ? "📚" : "💪"}
+          <>
+            <header className="flex items-center justify-between mb-6">
+              <button
+                onClick={() => { setStarted(false); setFinished(false); setQuestions([]); }}
+                className="flex items-center justify-center size-10 rounded-full glass glass-hover transition-all"
+              >
+                <span className="material-symbols-outlined text-slate-100">arrow_back</span>
+              </button>
+              <h1 className="text-xl font-bold tracking-tight">Quiz Results</h1>
+              <div className="size-10" />
+            </header>
+
+            {/* Circular progress */}
+            <div className="flex flex-col items-center justify-center py-8">
+              <div className="relative w-48 h-48 flex items-center justify-center">
+                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 192 192">
+                  <circle
+                    cx="96" cy="96" r={RADIUS} fill="transparent"
+                    stroke="rgba(137,90,246,0.15)" strokeWidth="12"
+                  />
+                  <circle
+                    cx="96" cy="96" r={RADIUS} fill="transparent"
+                    stroke="#895af6"
+                    strokeWidth="12"
+                    strokeDasharray={CIRCUMFERENCE}
+                    strokeDashoffset={offset}
+                    strokeLinecap="round"
+                  />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="text-4xl font-bold">{percentage}%</span>
+                  <span className="text-sm font-medium opacity-60">Score</span>
+                </div>
+              </div>
+              <div className="mt-6 text-center">
+                <h2 className="text-2xl font-bold mb-1">
+                  {percentage >= 80 ? "Excellent Work!" : percentage >= 60 ? "Good Job!" : percentage >= 40 ? "Keep Going!" : "Don't Give Up!"}
+                </h2>
+                <p className="text-primary font-medium">
+                  {percentage >= 80 ? "You've mastered this topic." : "Keep studying to improve."}
+                </p>
+              </div>
             </div>
-            <p className="text-sm mb-1" style={{ color: "rgba(255,255,255,0.35)" }}>Result</p>
-            <p className="text-6xl font-bold mb-1 text-gradient">{percentage}%</p>
-            <p className="text-sm mb-8" style={{ color: "rgba(255,255,255,0.4)" }}>
-              {score} of {questions.length} correct
-            </p>
-            <p className="text-sm mb-8" style={{ color: "rgba(255,255,255,0.5)" }}>
-              {percentage >= 80 ? "Excellent! You've mastered this topic."
-                : percentage >= 60 ? "Good job! A little more practice and you'll nail it."
-                : percentage >= 40 ? "Decent, but there's room to improve."
-                : "Keep studying — you'll get there!"}
-            </p>
-            <div className="grid gap-2.5">
-              <button onClick={generateQuiz} disabled={loading} className="btn-primary w-full">
+
+            {/* Stats */}
+            <div className="grid grid-cols-3 gap-3 mb-8">
+              <div className="bg-primary/10 border border-primary/20 rounded-xl p-4 flex flex-col items-center">
+                <span className="material-symbols-outlined text-green-500 mb-1">check_circle</span>
+                <span className="text-xl font-bold">{score}</span>
+                <span className="text-[10px] uppercase tracking-wider opacity-60">Correct</span>
+              </div>
+              <div className="bg-primary/10 border border-primary/20 rounded-xl p-4 flex flex-col items-center">
+                <span className="material-symbols-outlined text-red-500 mb-1">cancel</span>
+                <span className="text-xl font-bold">{questions.length - score}</span>
+                <span className="text-[10px] uppercase tracking-wider opacity-60">Incorrect</span>
+              </div>
+              <div className="bg-primary/10 border border-primary/20 rounded-xl p-4 flex flex-col items-center">
+                <span className="material-symbols-outlined text-orange-500 mb-1">local_fire_department</span>
+                <span className="text-xl font-bold">{maxStreak}</span>
+                <span className="text-[10px] uppercase tracking-wider opacity-60">Streak</span>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={generateQuiz}
+                disabled={loading}
+                className="w-full py-4 rounded-xl bg-gradient-to-r from-primary to-primary/80 text-white font-bold shadow-lg shadow-primary/20 disabled:opacity-40"
+              >
                 {loading ? "Generating..." : "New Quiz"}
               </button>
-              <Link href={`/${subjectId}`} className="btn-secondary w-full">Change Topic</Link>
-              <Link href="/" className="btn-secondary w-full">All Subjects</Link>
+              <Link
+                href={`/${subjectId}`}
+                className="w-full py-4 rounded-xl border-2 border-primary/40 text-primary font-bold hover:bg-primary/5 transition-colors text-center"
+              >
+                Change Topic
+              </Link>
+              <Link
+                href="/library"
+                className="w-full py-4 rounded-xl border border-white/10 text-slate-400 font-bold hover:text-white transition-colors text-center"
+              >
+                Back to Library
+              </Link>
             </div>
-          </div>
+          </>
         )}
       </div>
-    </main>
+      <BottomNav />
+    </div>
   );
 }
 

@@ -1,4 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
+
+export const maxDuration = 60;
 import { NextRequest, NextResponse } from "next/server";
 import { getSubject, getTopic } from "@/lib/subjects";
 

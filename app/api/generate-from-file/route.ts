@@ -1,6 +1,30 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest, NextResponse } from "next/server";
 import mammoth from "mammoth";
+import { auth } from "@clerk/nextjs/server";
+import { getSupabaseAdmin } from "@/lib/supabase-server";
+
+export const maxDuration = 60;
+
+const UPLOAD_LIMIT = 20;
+const WINDOW_HOURS = 2;
+
+async function checkRateLimit(userId: string): Promise<{ allowed: boolean; remaining: number }> {
+  const supabase = getSupabaseAdmin();
+  const windowStart = new Date(Date.now() - WINDOW_HOURS * 60 * 60 * 1000).toISOString();
+
+  const { count } = await supabase
+    .from("upload_logs")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", userId)
+    .gte("created_at", windowStart);
+
+  const used = count ?? 0;
+  if (used >= UPLOAD_LIMIT) return { allowed: false, remaining: 0 };
+
+  await supabase.from("upload_logs").insert({ user_id: userId });
+  return { allowed: true, remaining: UPLOAD_LIMIT - used - 1 };
+}
 
 const client = new Anthropic();
 
@@ -16,9 +40,29 @@ function isPdfType(mime: string): boolean {
 }
 
 export async function POST(req: NextRequest) {
+  const { userId, sessionClaims } = await auth();
+  if (!userId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const plan = (sessionClaims?.publicMetadata as { plan?: string } | undefined)?.plan ?? "free";
+  const isPro = plan === "pro";
+
+  if (!isPro) {
+    const { allowed } = await checkRateLimit(userId);
+    if (!allowed) {
+      return NextResponse.json(
+        { error: `Upload limit reached. You can make ${UPLOAD_LIMIT} uploads every ${WINDOW_HOURS} hours. Upgrade to Pro for unlimited uploads.` },
+        { status: 429 }
+      );
+    }
+  }
+
   const formData = await req.formData();
   const mode = formData.get("mode") as string;
-  const count = parseInt((formData.get("count") as string) || "10", 10);
+  const rawCount = parseInt((formData.get("count") as string) || "10", 10);
+  const maxCount = isPro ? 50 : 20;
+  const count = Math.min(rawCount, maxCount);
   const subject = (formData.get("subject") as string) || null;
   const topics = (formData.get("topics") as string) || null;
   const files = formData.getAll("files") as File[];
@@ -120,7 +164,7 @@ Rules:
 - Cover the most important concepts
 - Write in English`;
   } else if (mode === "problems") {
-    instruction = `Based on the content above (${fileNames.join(", ")}), create exactly ${count} math/science problems that test understanding of the material.${subjectCtx}
+    instruction = `Look at the problems, exercises, and tasks in the content above (${fileNames.join(", ")}). Generate exactly ${count} NEW problems that are similar in style, difficulty, and topic to the ones found in the material — but with different numbers, variables, or scenarios.${subjectCtx}
 
 Return ONLY valid JSON, no markdown, no explanation:
 {
@@ -135,10 +179,11 @@ Return ONLY valid JSON, no markdown, no explanation:
 }
 
 Rules:
-- Base problems ONLY on the content provided
-- Each problem must be solvable with the information given
+- Study the existing problems/exercises in the file and generate SIMILAR ones (same type, same difficulty range)
+- Do NOT copy problems directly — create new ones inspired by the material
+- Each problem must be fully solvable with clear steps
 - steps should be 3-6 clear steps showing the full solution
-- Vary difficulty
+- Vary difficulty slightly across the set
 - Write in English`;
   } else {
     instruction = `Based on the content above (${fileNames.join(", ")}), write a clear, well-structured lesson.

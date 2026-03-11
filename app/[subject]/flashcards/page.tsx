@@ -7,6 +7,7 @@ import type { Subject, Topic } from "@/lib/subjects";
 import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
 import { useState, useEffect, Suspense } from "react";
+import { BottomNav } from "@/components/ui/bottom-nav";
 
 interface Flashcard {
   front: string;
@@ -90,7 +91,7 @@ function FlashcardsContent() {
     <main className="relative min-h-screen">
       <div className="dot-grid absolute inset-0 pointer-events-none opacity-30" />
 
-      <div className="relative max-w-xl mx-auto px-5 py-14">
+      <div className="relative max-w-4xl mx-auto px-8 py-14">
         <Link href={`/${subjectId}`} className="inline-flex items-center gap-1.5 text-sm mb-10 transition-colors"
           style={{ color: "rgba(255,255,255,0.35)" }}
           onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.7)"; }}
@@ -227,6 +228,7 @@ function FlashcardsContent() {
           </div>
         )}
       </div>
+      <BottomNav />
     </main>
   );
 }
