@@ -122,18 +122,12 @@ function QuizContent() {
   const percentage = questions.length > 0 ? Math.round((score / questions.length) * 100) : 0;
   const progressPct = questions.length > 0 ? ((current / questions.length) * 100) : 0;
 
-  // Circular SVG for results
   const RADIUS = 88;
   const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
   const offset = CIRCUMFERENCE - (percentage / 100) * CIRCUMFERENCE;
 
   return (
-    <div className="bg-[#151022] text-slate-100 min-h-screen relative overflow-x-hidden font-sans">
-      {/* Background */}
-      <div className="fixed inset-0 dot-grid pointer-events-none" />
-      <div className="fixed top-[-10%] left-[-10%] w-[50%] h-[50%] orb-glow pointer-events-none" />
-      <div className="fixed bottom-[-10%] right-[-10%] w-[60%] h-[60%] orb-glow pointer-events-none" />
-
+    <div className="bg-[#111111] text-white min-h-screen relative overflow-x-hidden font-sans">
       <div className="relative z-10 flex flex-col min-h-screen max-w-5xl mx-auto px-8 py-6">
 
         {/* Setup Screen */}
@@ -142,38 +136,38 @@ function QuizContent() {
             <header className="flex items-center justify-between mb-8">
               <Link
                 href={`/${subjectId}`}
-                className="flex items-center justify-center size-10 rounded-full glass glass-hover transition-all"
+                className="flex items-center justify-center size-10 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-all"
               >
-                <span className="material-symbols-outlined text-slate-100">arrow_back</span>
+                <span className="material-symbols-outlined text-white">arrow_back</span>
               </Link>
               <div className="text-center">
-                <h2 className="text-slate-100 text-lg font-bold tracking-tight">Quiz Setup</h2>
-                <p className="text-primary text-xs font-medium uppercase tracking-widest">{subject.name}</p>
+                <h2 className="text-white text-lg font-bold tracking-tight">Quiz Setup</h2>
+                <p className="text-white/50 text-xs font-medium uppercase tracking-widest">{subject.name}</p>
               </div>
               <div className="size-10" />
             </header>
 
-            <div className="glass rounded-xl p-8 fade-up">
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-8">
               <div className="flex items-center gap-3 mb-8">
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-primary/20 border border-primary/30">
-                  <span className="material-symbols-outlined text-primary">quiz</span>
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-white/10 border border-white/10">
+                  <span className="material-symbols-outlined text-white">quiz</span>
                 </div>
                 <div>
                   <h1 className="font-bold text-white">{subject.name}</h1>
-                  <p className="text-sm text-slate-400">{topic ? topic.name : "All topics"}</p>
+                  <p className="text-sm text-white/50">{topic ? topic.name : "All topics"}</p>
                 </div>
               </div>
 
-              <p className="text-xs mb-3 font-bold uppercase tracking-widest text-slate-400">Number of Questions</p>
+              <p className="text-xs mb-3 font-bold uppercase tracking-widest text-white/40">Number of Questions</p>
               <div className="flex gap-2 mb-8">
                 {COUNT_OPTIONS.map((n) => (
                   <button key={n} onClick={() => setCount(n)}
                     className="flex-1 py-3 rounded-xl text-sm font-bold transition-all"
                     style={{
                       border: "1px solid",
-                      borderColor: count === n ? "rgba(137,90,246,0.6)" : "rgba(137,90,246,0.2)",
-                      background: count === n ? "rgba(137,90,246,0.15)" : "transparent",
-                      color: count === n ? "#c4b5fd" : "rgba(255,255,255,0.4)",
+                      borderColor: count === n ? "rgba(255,255,255,0.6)" : "rgba(255,255,255,0.1)",
+                      background: count === n ? "rgba(255,255,255,0.12)" : "transparent",
+                      color: count === n ? "#ffffff" : "rgba(255,255,255,0.35)",
                     }}>
                     {n}
                   </button>
@@ -185,7 +179,7 @@ function QuizContent() {
               <button
                 onClick={generateQuiz}
                 disabled={loading}
-                className="w-full py-5 rounded-xl bg-primary text-white font-bold text-lg hover:shadow-[0_0_25px_rgba(137,90,246,0.5)] transition-all flex items-center justify-center gap-2 disabled:opacity-40"
+                className="w-full py-5 rounded-xl bg-white text-[#111111] font-bold text-lg hover:opacity-90 transition-all flex items-center justify-center gap-2 disabled:opacity-40"
               >
                 {loading ? (
                   <>
@@ -211,45 +205,44 @@ function QuizContent() {
             <header className="flex items-center justify-between mb-8">
               <button
                 onClick={() => { setStarted(false); setQuestions([]); }}
-                className="flex items-center justify-center size-10 rounded-full glass glass-hover transition-all"
+                className="flex items-center justify-center size-10 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-all"
               >
-                <span className="material-symbols-outlined text-slate-100">close</span>
+                <span className="material-symbols-outlined text-white">close</span>
               </button>
               <div className="text-center">
-                <h2 className="text-slate-100 text-lg font-bold tracking-tight">
+                <h2 className="text-white text-lg font-bold tracking-tight">
                   Question {current + 1} of {questions.length}
                 </h2>
-                <p className="text-primary text-xs font-medium uppercase tracking-widest">{subject.name} Session</p>
+                <p className="text-white/40 text-xs font-medium uppercase tracking-widest">{subject.name} Session</p>
               </div>
-              <div className="flex items-center justify-center size-10 rounded-full glass">
-                <span className="text-xs font-bold text-primary">{score}</span>
+              <div className="flex items-center justify-center size-10 rounded-full bg-white/5 border border-white/10">
+                <span className="text-xs font-bold text-white">{score}</span>
               </div>
             </header>
 
             {/* Progress */}
             <div className="flex flex-col gap-2 mb-10">
               <div className="flex justify-between items-center px-1">
-                <span className="text-xs font-semibold text-primary/80 uppercase">Progress</span>
-                <span className="text-xs font-bold text-slate-100">{Math.round(progressPct)}%</span>
+                <span className="text-xs font-semibold text-white/40 uppercase">Progress</span>
+                <span className="text-xs font-bold text-white">{Math.round(progressPct)}%</span>
               </div>
-              <div className="h-1.5 w-full bg-primary/10 rounded-full overflow-hidden">
+              <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-primary rounded-full shadow-[0_0_10px_rgba(137,90,246,0.5)] transition-all duration-500"
+                  className="h-full bg-white rounded-full transition-all duration-500"
                   style={{ width: `${progressPct}%` }}
                 />
               </div>
             </div>
 
             {/* Question Card */}
-            <div className="glass rounded-xl p-8 relative overflow-hidden mb-6">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-16 -mt-16" />
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-8 relative overflow-hidden mb-6">
               <div className="relative z-10 flex flex-col items-center text-center">
                 {topic && (
-                  <span className="px-3 py-1 rounded-full bg-primary/20 border border-primary/30 text-primary text-[10px] font-bold uppercase tracking-widest mb-6">
+                  <span className="px-3 py-1 rounded-full bg-white/10 border border-white/20 text-white/60 text-[10px] font-bold uppercase tracking-widest mb-6">
                     {topic.name}
                   </span>
                 )}
-                <h1 className="text-2xl md:text-3xl font-bold leading-tight bg-gradient-to-br from-white via-slate-200 to-primary/60 bg-clip-text text-transparent">
+                <h1 className="text-2xl md:text-3xl font-bold leading-tight text-white">
                   {q.question}
                 </h1>
               </div>
@@ -257,8 +250,8 @@ function QuizContent() {
 
             {/* Hint */}
             {showHint && !revealed && (
-              <div className="glass rounded-xl p-4 mb-4 text-sm text-slate-300 border border-primary/20">
-                <span className="font-bold text-primary">Hint: </span>
+              <div className="bg-white/5 border border-white/10 rounded-xl p-4 mb-4 text-sm text-white/70">
+                <span className="font-bold text-white">Hint: </span>
                 {q.explanation}
               </div>
             )}
@@ -267,11 +260,11 @@ function QuizContent() {
             <div className="grid grid-cols-1 gap-3 mb-6">
               {q.options.map((opt, idx) => {
                 let bg = "transparent";
-                let borderColor = "rgba(137,90,246,0.2)";
+                let borderColor = "rgba(255,255,255,0.12)";
                 let color = "rgba(255,255,255,0.85)";
                 let labelBg = "transparent";
-                let labelBorder = "rgba(137,90,246,0.3)";
-                let labelColor = "rgba(255,255,255,0.8)";
+                let labelBorder = "rgba(255,255,255,0.15)";
+                let labelColor = "rgba(255,255,255,0.7)";
 
                 if (revealed) {
                   if (idx === q.answer) {
@@ -291,11 +284,11 @@ function QuizContent() {
                   } else {
                     color = "rgba(255,255,255,0.2)";
                     labelColor = "rgba(255,255,255,0.2)";
-                    labelBorder = "rgba(255,255,255,0.1)";
+                    labelBorder = "rgba(255,255,255,0.08)";
                   }
                 } else if (selected === idx) {
-                  bg = "rgba(137,90,246,0.2)";
-                  borderColor = "rgba(137,90,246,0.6)";
+                  bg = "rgba(255,255,255,0.1)";
+                  borderColor = "rgba(255,255,255,0.5)";
                 }
 
                 return (
@@ -335,9 +328,9 @@ function QuizContent() {
 
             {/* Explanation after reveal */}
             {revealed && (
-              <div className="glass rounded-xl p-4 mb-5 text-sm border-primary/20">
-                <span className="font-bold text-primary/70">Explanation  </span>
-                <span className="text-slate-300">{q.explanation}</span>
+              <div className="bg-white/5 border border-white/10 rounded-xl p-4 mb-5 text-sm">
+                <span className="font-bold text-white/50">Explanation  </span>
+                <span className="text-white/70">{q.explanation}</span>
               </div>
             )}
 
@@ -346,7 +339,7 @@ function QuizContent() {
               {!revealed && (
                 <button
                   onClick={() => setShowHint((h) => !h)}
-                  className="w-full py-4 rounded-xl border border-primary/40 text-primary font-bold hover:bg-primary/5 transition-all flex items-center justify-center gap-2"
+                  className="w-full py-4 rounded-xl border border-white/15 text-white/60 font-bold hover:bg-white/5 transition-all flex items-center justify-center gap-2"
                 >
                   <span className="material-symbols-outlined text-xl leading-none">lightbulb</span>
                   {showHint ? "Hide Hint" : "Hint"}
@@ -355,7 +348,7 @@ function QuizContent() {
               {revealed && (
                 <button
                   onClick={next}
-                  className="w-full py-5 rounded-xl bg-primary text-white font-bold text-lg hover:shadow-[0_0_25px_rgba(137,90,246,0.5)] transition-all flex items-center justify-center gap-2"
+                  className="w-full py-5 rounded-xl bg-white text-[#111111] font-bold text-lg hover:opacity-90 transition-all flex items-center justify-center gap-2"
                 >
                   {current + 1 >= questions.length ? "See Results" : "Next Question"}
                   <span className="material-symbols-outlined leading-none">arrow_forward</span>
@@ -371,9 +364,9 @@ function QuizContent() {
             <header className="flex items-center justify-between mb-6">
               <button
                 onClick={() => { setStarted(false); setFinished(false); setQuestions([]); }}
-                className="flex items-center justify-center size-10 rounded-full glass glass-hover transition-all"
+                className="flex items-center justify-center size-10 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-all"
               >
-                <span className="material-symbols-outlined text-slate-100">arrow_back</span>
+                <span className="material-symbols-outlined text-white">arrow_back</span>
               </button>
               <h1 className="text-xl font-bold tracking-tight">Quiz Results</h1>
               <div className="size-10" />
@@ -383,13 +376,10 @@ function QuizContent() {
             <div className="flex flex-col items-center justify-center py-8">
               <div className="relative w-48 h-48 flex items-center justify-center">
                 <svg className="w-full h-full transform -rotate-90" viewBox="0 0 192 192">
+                  <circle cx="96" cy="96" r={RADIUS} fill="transparent" stroke="rgba(255,255,255,0.08)" strokeWidth="12" />
                   <circle
                     cx="96" cy="96" r={RADIUS} fill="transparent"
-                    stroke="rgba(137,90,246,0.15)" strokeWidth="12"
-                  />
-                  <circle
-                    cx="96" cy="96" r={RADIUS} fill="transparent"
-                    stroke="#895af6"
+                    stroke="#ffffff"
                     strokeWidth="12"
                     strokeDasharray={CIRCUMFERENCE}
                     strokeDashoffset={offset}
@@ -398,14 +388,14 @@ function QuizContent() {
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                   <span className="text-4xl font-bold">{percentage}%</span>
-                  <span className="text-sm font-medium opacity-60">Score</span>
+                  <span className="text-sm font-medium text-white/50">Score</span>
                 </div>
               </div>
               <div className="mt-6 text-center">
                 <h2 className="text-2xl font-bold mb-1">
                   {percentage >= 80 ? "Excellent Work!" : percentage >= 60 ? "Good Job!" : percentage >= 40 ? "Keep Going!" : "Don't Give Up!"}
                 </h2>
-                <p className="text-primary font-medium">
+                <p className="text-white/50 font-medium">
                   {percentage >= 80 ? "You've mastered this topic." : "Keep studying to improve."}
                 </p>
               </div>
@@ -413,20 +403,20 @@ function QuizContent() {
 
             {/* Stats */}
             <div className="grid grid-cols-3 gap-3 mb-8">
-              <div className="bg-primary/10 border border-primary/20 rounded-xl p-4 flex flex-col items-center">
+              <div className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col items-center">
                 <span className="material-symbols-outlined text-green-500 mb-1">check_circle</span>
                 <span className="text-xl font-bold">{score}</span>
-                <span className="text-[10px] uppercase tracking-wider opacity-60">Correct</span>
+                <span className="text-[10px] uppercase tracking-wider text-white/40">Correct</span>
               </div>
-              <div className="bg-primary/10 border border-primary/20 rounded-xl p-4 flex flex-col items-center">
+              <div className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col items-center">
                 <span className="material-symbols-outlined text-red-500 mb-1">cancel</span>
                 <span className="text-xl font-bold">{questions.length - score}</span>
-                <span className="text-[10px] uppercase tracking-wider opacity-60">Incorrect</span>
+                <span className="text-[10px] uppercase tracking-wider text-white/40">Incorrect</span>
               </div>
-              <div className="bg-primary/10 border border-primary/20 rounded-xl p-4 flex flex-col items-center">
+              <div className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col items-center">
                 <span className="material-symbols-outlined text-orange-500 mb-1">local_fire_department</span>
                 <span className="text-xl font-bold">{maxStreak}</span>
-                <span className="text-[10px] uppercase tracking-wider opacity-60">Streak</span>
+                <span className="text-[10px] uppercase tracking-wider text-white/40">Streak</span>
               </div>
             </div>
 
@@ -435,19 +425,19 @@ function QuizContent() {
               <button
                 onClick={generateQuiz}
                 disabled={loading}
-                className="w-full py-4 rounded-xl bg-gradient-to-r from-primary to-primary/80 text-white font-bold shadow-lg shadow-primary/20 disabled:opacity-40"
+                className="w-full py-4 rounded-xl bg-white text-[#111111] font-bold hover:opacity-90 transition-all disabled:opacity-40"
               >
                 {loading ? "Generating..." : "New Quiz"}
               </button>
               <Link
                 href={`/${subjectId}`}
-                className="w-full py-4 rounded-xl border-2 border-primary/40 text-primary font-bold hover:bg-primary/5 transition-colors text-center"
+                className="w-full py-4 rounded-xl border border-white/15 text-white/60 font-bold hover:bg-white/5 transition-colors text-center"
               >
                 Change Topic
               </Link>
               <Link
                 href="/library"
-                className="w-full py-4 rounded-xl border border-white/10 text-slate-400 font-bold hover:text-white transition-colors text-center"
+                className="w-full py-4 rounded-xl border border-white/8 text-white/30 font-bold hover:text-white/60 transition-colors text-center"
               >
                 Back to Library
               </Link>
