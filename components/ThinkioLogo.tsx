@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-export function ThinkioLogo({ className, size = 32 }: { className?: string; size?: number }) {
+export function ThinkioLogo({ className, size = 32, iconOnly = false }: { className?: string; size?: number; iconOnly?: boolean }) {
   return (
     <span className={cn("flex items-center gap-2", className)}>
       <svg width={size} height={size} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -24,7 +24,7 @@ export function ThinkioLogo({ className, size = 32 }: { className?: string; size
           </linearGradient>
         </defs>
       </svg>
-      <span className="text-lg font-bold text-[#111111] dark:text-white tracking-tight">Thinkio</span>
+      {!iconOnly && <span className="text-lg font-bold text-[#111111] dark:text-white tracking-tight">Thinkio</span>}
     </span>
   );
 }
