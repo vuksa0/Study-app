@@ -208,8 +208,8 @@ function ProblemsContent() {
   if (!subject) return null;
 
   return (
-    <main className="relative min-h-screen">
-      <div className="dot-grid absolute inset-0 pointer-events-none opacity-30" />
+    <main className="relative min-h-screen bg-[#111111] text-white">
+      <div className="dot-grid absolute inset-0 pointer-events-none opacity-10" />
       <div className="relative max-w-4xl mx-auto px-8 py-14">
 
         <Link href={`/${subjectId}`}
