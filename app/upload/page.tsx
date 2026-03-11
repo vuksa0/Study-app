@@ -10,6 +10,7 @@ import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import { BookOpen, Zap, FileText, Calculator, Upload, X, ChevronDown, ArrowRight, Camera } from "lucide-react";
+import { Spinner } from "@/components/ui/ios-spinner";
 
 // ── Function graph helpers ─────────────────────────────────────────────────
 function extractFunctionExpr(text: string): string | null {
@@ -707,7 +708,7 @@ function UploadContent() {
       <div className="flex flex-1 items-center justify-center px-6">
         <div className="text-center">
           <div className="mb-6 flex items-center justify-center">
-            <div className="h-12 w-12 rounded-full border-4 border-[#E2E8F0] dark:border-[#2D3748] border-t-[#111111] dark:border-t-white animate-spin" />
+            <Spinner size="lg" className="h-12 w-12 text-[#111111] dark:text-white" />
           </div>
           <h2 className="mb-2 text-xl font-black text-[#111111] dark:text-white">Generating your {mode}…</h2>
           <p className="text-sm text-[#64748B] dark:text-[#94A3B8]">Analyzing {files.length} file{files.length > 1 ? "s" : ""}</p>

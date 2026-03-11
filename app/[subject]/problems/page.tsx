@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
 import { useState, useEffect, useRef, Suspense, useCallback } from "react";
 import { BottomNav } from "@/components/ui/bottom-nav";
+import { Spinner } from "@/components/ui/ios-spinner";
 
 interface Problem {
   problem: string;
@@ -274,10 +275,7 @@ function ProblemsContent() {
         {/* Loading */}
         {loading && (
           <div className="card-glow rounded-2xl p-10 text-center">
-            <svg className="animate-spin mx-auto mb-4" width="28" height="28" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="10" stroke="rgba(255,255,255,0.1)" strokeWidth="3" />
-              <path d="M12 2a10 10 0 0 1 10 10" stroke="#7c3aed" strokeWidth="3" strokeLinecap="round" />
-            </svg>
+            <Spinner size="lg" className="mx-auto mb-4 text-white" />
             <p className="text-sm" style={{ color: "rgba(255,255,255,0.4)" }}>Generating problem...</p>
           </div>
         )}
@@ -410,9 +408,7 @@ function ProblemsContent() {
               <button onClick={submitAnswer} disabled={checking} className="btn-primary">
                 {checking ? (
                   <>
-                    <svg className="animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none">
-                      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeDasharray="40" strokeDashoffset="15" />
-                    </svg>
+                    <Spinner size="sm" className="text-white" />
                     Checking…
                   </>
                 ) : "Submit Answer"}

@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
 import { useState, useEffect, Suspense } from "react";
 import { BottomNav } from "@/components/ui/bottom-nav";
+import { Spinner } from "@/components/ui/ios-spinner";
 
 interface Question {
   question: string;
@@ -183,9 +184,7 @@ function QuizContent() {
               >
                 {loading ? (
                   <>
-                    <svg className="animate-spin" width="18" height="18" viewBox="0 0 24 24" fill="none">
-                      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeDasharray="40" strokeDashoffset="15"/>
-                    </svg>
+                    <Spinner size="sm" className="text-[#111111]" />
                     Generating...
                   </>
                 ) : (
