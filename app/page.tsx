@@ -51,14 +51,6 @@ export default function Home() {
             Upload your notes and start learning in seconds.
           </p>
 
-          <div className="mb-8 flex items-center justify-center gap-3">
-            <div className="flex -space-x-2">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="h-10 w-10 rounded-full border-2 border-white dark:border-[#111111] bg-[#E2E8F0] dark:bg-[#2D3748]" />
-              ))}
-            </div>
-            <span className="text-sm text-[#64748B] dark:text-[#94A3B8]">Join students already studying smarter</span>
-          </div>
 
           <div className="flex flex-col items-center justify-center gap-3 md:flex-row">
             <Link href="/subjects" className="group relative overflow-hidden rounded-full bg-[#111111] dark:bg-white px-8 h-12 flex items-center justify-center text-sm font-bold text-white dark:text-[#111111] w-full md:w-auto">
