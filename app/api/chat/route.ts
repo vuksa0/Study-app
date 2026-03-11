@@ -13,9 +13,9 @@ Subjects: Mathematics, Physics, Chemistry, History, Biology, Literature, Economi
 Flashcards: Basic (Still Learning/Got It). Advanced (Again/Hard/Easy with re-queue) — Plus & Pro only.
 
 Plans:
-- Free: 5 uploads/day, basic flashcards, all subjects, quiz & lesson generation
-- Plus $9/mo or $86/yr: 20 uploads per 2 hours, advanced flashcards, up to 20 questions/gen, priority support
-- Pro $25/mo or $240/yr: unlimited uploads, advanced flashcards, up to 50 questions/gen, export as .txt, priority support
+- Free: 3 uploads/week, 1 subject, basic flashcards, quiz & lesson generation
+- Plus $9/mo or $86/yr: 20 uploads/week, all 8 subjects, advanced flashcards, up to 20 questions/gen
+- Pro $25/mo or $240/yr: unlimited uploads, all subjects, advanced flashcards, up to 50 questions/gen, export as .txt
 
 Getting started: sign up at thinkio.app, pick a subject or upload notes, choose a study mode, generate content in seconds.
 

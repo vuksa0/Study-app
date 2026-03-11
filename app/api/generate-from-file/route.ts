@@ -6,12 +6,15 @@ import { getSupabaseAdmin } from "@/lib/supabase-server";
 
 export const maxDuration = 60;
 
-const UPLOAD_LIMIT = 20;
-const WINDOW_HOURS = 2;
+const LIMITS = {
+  free: { count: 3, hours: 168 },   // 3 per week
+  plus: { count: 20, hours: 168 },  // 20 per week
+};
 
-async function checkRateLimit(userId: string): Promise<{ allowed: boolean; remaining: number }> {
+async function checkRateLimit(userId: string, plan: string): Promise<{ allowed: boolean; remaining: number }> {
+  const limit = plan === "plus" ? LIMITS.plus : LIMITS.free;
   const supabase = getSupabaseAdmin();
-  const windowStart = new Date(Date.now() - WINDOW_HOURS * 60 * 60 * 1000).toISOString();
+  const windowStart = new Date(Date.now() - limit.hours * 60 * 60 * 1000).toISOString();
 
   const { count } = await supabase
     .from("upload_logs")
@@ -20,10 +23,10 @@ async function checkRateLimit(userId: string): Promise<{ allowed: boolean; remai
     .gte("created_at", windowStart);
 
   const used = count ?? 0;
-  if (used >= UPLOAD_LIMIT) return { allowed: false, remaining: 0 };
+  if (used >= limit.count) return { allowed: false, remaining: 0 };
 
   await supabase.from("upload_logs").insert({ user_id: userId });
-  return { allowed: true, remaining: UPLOAD_LIMIT - used - 1 };
+  return { allowed: true, remaining: limit.count - used - 1 };
 }
 
 const client = new Anthropic();
@@ -49,10 +52,11 @@ export async function POST(req: NextRequest) {
   const isPro = plan === "pro";
 
   if (!isPro) {
-    const { allowed } = await checkRateLimit(userId);
+    const { allowed } = await checkRateLimit(userId, plan);
     if (!allowed) {
+      const limit = plan === "plus" ? LIMITS.plus : LIMITS.free;
       return NextResponse.json(
-        { error: `Upload limit reached. You can make ${UPLOAD_LIMIT} uploads every ${WINDOW_HOURS} hours. Upgrade to Pro for unlimited uploads.` },
+        { error: `Upload limit reached. You can make ${limit.count} uploads per week on the ${plan} plan. Upgrade for more uploads.` },
         { status: 429 }
       );
     }
