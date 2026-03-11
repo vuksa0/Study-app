@@ -449,7 +449,13 @@ function UploadContent() {
 
     try {
       const res = await fetch("/api/generate-from-file", { method: "POST", body: fd });
-      const data = await res.json();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let data: any;
+      try {
+        data = await res.json();
+      } catch {
+        throw new Error(`Server error (${res.status}). Please try again.`);
+      }
       if (!res.ok) {
         const msg = typeof data.error === "string" ? data.error : (data.error?.message ?? "Generation failed");
         throw new Error(msg);
