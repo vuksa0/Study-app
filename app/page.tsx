@@ -57,7 +57,7 @@ export default function Home() {
                 <div key={i} className="h-10 w-10 rounded-full border-2 border-white dark:border-[#111111] bg-[#E2E8F0] dark:bg-[#2D3748]" />
               ))}
             </div>
-            <span className="text-sm text-[#64748B] dark:text-[#94A3B8]">Trusted by 10,000+ students</span>
+            <span className="text-sm text-[#64748B] dark:text-[#94A3B8]">Join students already studying smarter</span>
           </div>
 
           <div className="flex flex-col items-center justify-center gap-3 md:flex-row">
@@ -133,10 +133,10 @@ export default function Home() {
         <div className="mx-auto max-w-5xl">
           <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
             {[
-              { num: "10,000+", label: "Active students" },
               { num: "8", label: "Core subjects" },
-              { num: "2×", label: "Faster learning" },
-              { num: "< 10s", label: "To get started" },
+              { num: "4", label: "Study modes" },
+              { num: "< 10s", label: "To generate content" },
+              { num: "Free", label: "To get started" },
             ].map((s) => (
               <div key={s.label} className="text-center">
                 <div className="mb-1 text-3xl font-black text-[#111111] dark:text-white">{s.num}</div>
