@@ -1,6 +1,10 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-const isProtected = createRouteMatcher(["/upload(.*)", "/library(.*)"]);
+const isProtected = createRouteMatcher([
+  "/upload(.*)",
+  "/library(.*)",
+  "/:subject((?!api|_next|favicon\\.ico|get-started|login|subjects|subscription|create)[^/]+)(.*)",
+]);
 
 export default clerkMiddleware(async (auth, req) => {
   if (isProtected(req)) await auth.protect();
