@@ -9,7 +9,7 @@ import type { TestDate } from "@/lib/test-date";
 const client = new Anthropic();
 
 export async function POST(req: NextRequest) {
-  const { subjectId, topicId, subjectName, topicName, topicDescription, testDate } = await req.json();
+  const { subjectId, topicId, subjectName, topicName, topicDescription, testDate, language = "English" } = await req.json();
   const urgency = urgencyPrompt(testDate as TestDate | null);
 
   let resolvedSubjectName: string;
@@ -60,7 +60,7 @@ Rules:
 - 4 to 6 sections covering the main concepts
 - Each section should be informative but concise (3-5 sentences)
 - Include 5-8 key terms
-- Write in English
+- Write in ${language}
 - Use clear, educational language suitable for students${urgency ? `\n\n${urgency}` : ""}`;
 
   try {

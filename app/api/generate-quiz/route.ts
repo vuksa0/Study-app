@@ -9,7 +9,7 @@ import type { TestDate } from "@/lib/test-date";
 const client = new Anthropic();
 
 export async function POST(req: NextRequest) {
-  const { subjectId, topicId, count = 5, subjectName, topicName, topicDescription, testDate } = await req.json();
+  const { subjectId, topicId, count = 5, subjectName, topicName, topicDescription, testDate, language = "English" } = await req.json();
   const urgency = urgencyPrompt(testDate as TestDate | null);
 
   let resolvedSubjectName: string;
@@ -65,7 +65,7 @@ Rules:
 - Each question has exactly 4 options (A, B, C, D)
 - "answer" is the index of the correct option (0-3)
 - Questions should vary in difficulty
-- Write in English${mathExtraRules}${urgency ? `\n\n${urgency}` : ""}`;
+- Write in ${language}${mathExtraRules}${urgency ? `\n\n${urgency}` : ""}`;
 
   try {
     const message = await client.messages.create({

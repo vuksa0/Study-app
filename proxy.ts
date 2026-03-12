@@ -9,6 +9,7 @@ const isPublic = createRouteMatcher([
   "/progress(.*)",
   "/roadmap(.*)",
   "/subscription(.*)",
+  "/pricing(.*)",
   "/create(.*)",
   "/api/chat(.*)",
 ]);

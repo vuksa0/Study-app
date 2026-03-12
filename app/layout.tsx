@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ChatBot } from "@/components/ChatBot";
+import { LocaleProvider } from "@/components/LocaleProvider";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
@@ -24,8 +25,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={`${inter.variable} font-sans min-h-screen antialiased`}>
         <ClerkProvider>
           <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
-            {children}
-            <ChatBot />
+            <LocaleProvider>
+              {children}
+              <ChatBot />
+            </LocaleProvider>
           </ThemeProvider>
         </ClerkProvider>
       </body>

@@ -10,6 +10,8 @@ import { UserButton, Show } from "@clerk/nextjs";
 import { SubscriptionTab } from "@/components/SubscriptionTab";
 import { CreditCard } from "lucide-react";
 import { ThinkioLogo } from "@/components/ThinkioLogo";
+import { useLocale } from "@/components/LocaleProvider";
+import { SUPPORTED_LANGUAGES, type LangCode } from "@/lib/i18n";
 
 export function Navigation() {
   const { theme, setTheme } = useTheme();
@@ -18,6 +20,10 @@ export function Navigation() {
   const [featuresOpen, setFeaturesOpen] = useState(false);
   const subjectsRef = useRef<HTMLDivElement>(null);
   const featuresRef = useRef<HTMLDivElement>(null);
+  const [langOpen, setLangOpen] = useState(false);
+  const langRef = useRef<HTMLDivElement>(null);
+  const { language, setLanguage } = useLocale();
+  const currentLang = SUPPORTED_LANGUAGES.find((l) => l.code === language);
 
   useEffect(() => setMounted(true), []);
 
@@ -26,9 +32,8 @@ export function Navigation() {
       if (subjectsRef.current && !subjectsRef.current.contains(e.target as Node)) {
         setSubjectsOpen(false);
       }
-      if (featuresRef.current && !featuresRef.current.contains(e.target as Node)) {
-        setFeaturesOpen(false);
-      }
+      if (featuresRef.current && !featuresRef.current.contains(e.target as Node)) setFeaturesOpen(false);
+      if (langRef.current && !langRef.current.contains(e.target as Node)) setLangOpen(false);
     }
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
@@ -66,7 +71,7 @@ export function Navigation() {
           {/* Features dropdown */}
           <div className="relative" ref={featuresRef}>
             <button
-              onClick={() => { setFeaturesOpen((o) => !o); setSubjectsOpen(false); }}
+              onClick={() => { setFeaturesOpen((o) => !o); setSubjectsOpen(false); setLangOpen(false); }}
               className="rounded-full border border-[#E2E8F0] dark:border-[#2D3748] px-4 py-1.5 text-sm text-[#64748B] dark:text-[#94A3B8] hover:border-[#111111] dark:hover:border-white hover:text-[#111111] dark:hover:text-white transition-colors flex items-center gap-1"
             >
               Features
@@ -120,7 +125,7 @@ export function Navigation() {
           {/* Subjects dropdown */}
           <div className="relative" ref={subjectsRef}>
             <button
-              onClick={() => { setSubjectsOpen((o) => !o); setFeaturesOpen(false); }}
+              onClick={() => { setSubjectsOpen((o) => !o); setFeaturesOpen(false); setLangOpen(false); }}
               className="rounded-full border border-[#E2E8F0] dark:border-[#2D3748] px-4 py-1.5 text-sm text-[#64748B] dark:text-[#94A3B8] hover:border-[#111111] dark:hover:border-white hover:text-[#111111] dark:hover:text-white transition-colors flex items-center gap-1"
             >
               Subjects
@@ -160,6 +165,28 @@ export function Navigation() {
 
         {/* Right side — always visible */}
         <div className="flex items-center gap-3">
+          {/* Lang */}
+          {mounted && (
+            <div className="relative" ref={langRef}>
+              <button onClick={() => { setLangOpen((o) => !o); setFeaturesOpen(false); setSubjectsOpen(false); }} className="flex items-center gap-1.5 rounded-full border border-[#E2E8F0] dark:border-[#2D3748] px-3 py-1.5 text-sm text-[#64748B] dark:text-[#94A3B8] hover:border-[#111111] dark:hover:border-white transition-colors">
+                <span className="text-base leading-none">{currentLang?.flag ?? "🌐"}</span>
+                <span className="hidden sm:block text-xs font-medium">{currentLang?.code.toUpperCase()}</span>
+              </button>
+              {langOpen && (
+                <div className="absolute top-full right-0 mt-2 w-48 rounded-2xl bg-white dark:bg-[#1a1a1a] border border-[#E2E8F0] dark:border-[#2D3748] shadow-xl z-50">
+                  <div className="p-2 max-h-72 overflow-y-auto">
+                    <p className="text-[10px] font-semibold text-[#94A3B8] uppercase tracking-wide px-2 py-1.5">Language</p>
+                    {SUPPORTED_LANGUAGES.map((l) => (
+                      <button key={l.code} onClick={() => { setLanguage(l.code as LangCode); setLangOpen(false); }} className={["w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm transition-colors", language === l.code ? "bg-[#F1F5F9] dark:bg-[#2D3748] font-semibold text-[#111111] dark:text-white" : "text-[#64748B] dark:text-[#94A3B8] hover:bg-[#F8FAFC] dark:hover:bg-[#252525]"].join(" ")}>
+                        <span className="text-base">{l.flag}</span>
+                        <span>{l.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
           {mounted && (
             <button
               onClick={() => setTheme(isDark ? "light" : "dark")}

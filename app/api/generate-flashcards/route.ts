@@ -9,7 +9,7 @@ import type { TestDate } from "@/lib/test-date";
 const client = new Anthropic();
 
 export async function POST(req: NextRequest) {
-  const { subjectId, topicId, count = 10, subjectName, topicName, topicDescription, testDate } = await req.json();
+  const { subjectId, topicId, count = 10, subjectName, topicName, topicDescription, testDate, language = "English" } = await req.json();
   const urgency = urgencyPrompt(testDate as TestDate | null);
 
   let resolvedSubjectName: string;
@@ -53,7 +53,7 @@ Rules:
 - Back side: the definition, explanation, or answer
 - Keep each side concise and clear
 - Cover the most important concepts from the topic
-- Write in English${urgency ? `\n\n${urgency}` : ""}`;
+- Write in ${language}${urgency ? `\n\n${urgency}` : ""}`;
 
   try {
     const message = await client.messages.create({

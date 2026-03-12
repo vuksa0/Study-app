@@ -8,12 +8,11 @@ import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
 import { useState, useEffect, Suspense } from "react";
 import { useAuth } from "@clerk/nextjs";
+import { ChevronLeft, Zap } from "lucide-react";
+import { SUBJECT_ICON_MAP } from "@/components/SubjectIcons";
 import { BottomNav } from "@/components/ui/bottom-nav";
 
-interface Flashcard {
-  front: string;
-  back: string;
-}
+interface Flashcard { front: string; back: string; }
 
 const COUNT_OPTIONS = [5, 10, 15, 20];
 
@@ -27,27 +26,6 @@ function FlashcardsContent() {
   const [subject, setSubject] = useState<Subject | null>(null);
   const [topic, setTopic] = useState<Topic | null>(null);
   const [count, setCount] = useState(10);
-  const [saved, setSaved] = useState(false);
-  const [saving, setSaving] = useState(false);
-
-  async function saveDeck() {
-    if (!isSignedIn || !subject || saving || saved) return;
-    setSaving(true);
-    try {
-      await fetch("/api/library", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: "flashcards",
-          subject_id: subjectId,
-          subject_name: subject.name,
-          title: `${subject.name}${topic ? ` · ${topic.name}` : ""} Flashcards`,
-          data: { flashcards: cards },
-        }),
-      });
-      setSaved(true);
-    } catch { /* silent */ } finally { setSaving(false); }
-  }
   const [cards, setCards] = useState<Flashcard[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -56,6 +34,8 @@ function FlashcardsContent() {
   const [flipped, setFlipped] = useState(false);
   const [known, setKnown] = useState<Set<number>>(new Set());
   const [finished, setFinished] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     const builtin = getSubject(subjectId);
@@ -92,15 +72,21 @@ function FlashcardsContent() {
     }
   }
 
-  function markKnown() {
-    setKnown((prev) => new Set([...prev, current]));
-    goNext();
+  async function saveDeck() {
+    if (!isSignedIn || !subject || saving || saved) return;
+    setSaving(true);
+    try {
+      await fetch("/api/library", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "flashcards", subject_id: subjectId, subject_name: subject.name, title: `${subject.name}${topic ? ` · ${topic.name}` : ""} Flashcards`, data: { flashcards: cards } }),
+      });
+      setSaved(true);
+    } catch { /* silent */ } finally { setSaving(false); }
   }
 
-  function markStudying() {
-    goNext();
-  }
-
+  function markKnown() { setKnown((prev) => new Set([...prev, current])); goNext(); }
+  function markStudying() { goNext(); }
   function goNext() {
     if (current + 1 >= cards.length) setFinished(true);
     else { setCurrent((c) => c + 1); setFlipped(false); }
@@ -108,72 +94,72 @@ function FlashcardsContent() {
 
   if (!subject) return null;
 
+  const def = SUBJECT_ICON_MAP[subjectId];
   const card = cards[current];
 
   return (
-    <main className="relative min-h-screen bg-[#111111] text-white">
-      <div className="dot-grid absolute inset-0 pointer-events-none opacity-10" />
-
-      <div className="relative max-w-4xl mx-auto px-8 py-14">
-        <Link href={`/${subjectId}`} className="inline-flex items-center gap-1.5 text-sm mb-10 transition-colors"
-          style={{ color: "rgba(255,255,255,0.35)" }}
-          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.7)"; }}
-          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.35)"; }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M19 12H5M12 5l-7 7 7 7"/>
-          </svg>
+    <main className="min-h-screen bg-white dark:bg-[#111111]">
+      <div className="max-w-2xl mx-auto px-6 py-14">
+        <Link
+          href={`/subject/${subjectId}`}
+          className="inline-flex items-center gap-1.5 text-sm text-[#94A3B8] hover:text-[#64748B] dark:hover:text-white transition-colors mb-10"
+        >
+          <ChevronLeft className="h-4 w-4" />
           {subject.name}
         </Link>
 
         {/* Setup */}
         {!started && (
-          <div className="card-glow rounded-2xl p-8 fade-up">
+          <div className="rounded-2xl border border-[#E2E8F0] dark:border-[#2D3748] bg-white dark:bg-[#1A1A1A] p-8 shadow-sm">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
-                style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}>
-                {subject.emoji}
+              <div
+                className="flex h-12 w-12 items-center justify-center rounded-xl shrink-0"
+                style={def ? { background: `${def.color}18` } : { background: "#F1F5F9" }}
+              >
+                {def ? <def.Icon className="h-5 w-5" /> : <Zap className="h-5 w-5 text-[#94A3B8]" />}
               </div>
               <div>
-                <h1 className="font-semibold text-white/90">Flash Cards</h1>
-                <p className="text-sm" style={{ color: "rgba(255,255,255,0.35)" }}>
-                  {subject.name}{topic ? ` · ${topic.name}` : ""}
-                </p>
+                <h1 className="font-semibold text-[#111111] dark:text-white">Flash Cards</h1>
+                <p className="text-sm text-[#94A3B8]">{subject.name}{topic ? ` · ${topic.name}` : ""}</p>
               </div>
             </div>
 
             <div className="mb-6">
-              <p className="text-xs mb-3 font-medium" style={{ color: "rgba(255,255,255,0.35)" }}>NUMBER OF CARDS</p>
+              <p className="text-xs mb-3 font-medium text-[#94A3B8] uppercase tracking-wide">Number of cards</p>
               <div className="flex gap-2">
                 {COUNT_OPTIONS.map((n) => (
-                  <button key={n} onClick={() => setCount(n)}
-                    className="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all"
-                    style={{
-                      border: "1px solid",
-                      borderColor: count === n ? "rgba(139,92,246,0.5)" : "var(--border)",
-                      background: count === n ? "rgba(139,92,246,0.12)" : "transparent",
-                      color: count === n ? "#c4b5fd" : "rgba(255,255,255,0.4)",
-                    }}>
+                  <button
+                    key={n}
+                    onClick={() => setCount(n)}
+                    className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all border ${
+                      count === n
+                        ? "bg-[#111111] dark:bg-white text-white dark:text-[#111111] border-[#111111] dark:border-white"
+                        : "border-[#E2E8F0] dark:border-[#2D3748] text-[#64748B] dark:text-[#94A3B8] hover:border-[#CBD5E1]"
+                    }`}
+                  >
                     {n}
                   </button>
                 ))}
               </div>
             </div>
 
-            {error && <p className="text-red-400 text-sm mb-4">{error}</p>}
+            {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
 
-            <button onClick={generateCards} disabled={loading} className="btn-primary w-full">
+            <button
+              onClick={generateCards}
+              disabled={loading}
+              className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#111111] dark:bg-white text-white dark:text-[#111111] py-3.5 text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
+            >
               {loading ? (
                 <>
-                  <svg className="animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none">
+                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
                     <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeDasharray="40" strokeDashoffset="15"/>
                   </svg>
-                  Generating cards...
+                  Generating cards…
                 </>
               ) : (
                 <>
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>
-                  </svg>
+                  <Zap className="h-4 w-4" />
                   Generate Flash Cards
                 </>
               )}
@@ -185,76 +171,68 @@ function FlashcardsContent() {
         {started && !finished && card && (
           <div>
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-medium" style={{ color: "rgba(255,255,255,0.35)" }}>
-                {current + 1} / {cards.length}
-              </span>
-              <span className="text-xs font-semibold" style={{ color: "#86efac" }}>
-                {known.size} known
-              </span>
+              <span className="text-xs font-medium text-[#94A3B8]">{current + 1} / {cards.length}</span>
+              <span className="text-xs font-semibold text-green-600 dark:text-green-400">{known.size} known</span>
             </div>
-            <div className="w-full h-1 rounded-full mb-8 overflow-hidden" style={{ background: "var(--surface-2)" }}>
-              <div className="h-full rounded-full transition-all duration-500"
-                style={{ width: `${(current / cards.length) * 100}%`, background: "linear-gradient(90deg,#7c3aed,#06b6d4)" }} />
+            <div className="w-full h-1.5 rounded-full mb-8 overflow-hidden bg-[#F1F5F9] dark:bg-[#2D3748]">
+              <div
+                className="h-full rounded-full transition-all duration-500 bg-[#111111] dark:bg-white"
+                style={{ width: `${(current / cards.length) * 100}%` }}
+              />
             </div>
 
-            {/* Flip card */}
             <button
               onClick={() => setFlipped((f) => !f)}
-              className="w-full rounded-2xl p-8 text-center cursor-pointer transition-all mb-4 min-h-[200px] flex flex-col items-center justify-center gap-3"
-              style={{ background: "var(--surface)", border: "1px solid var(--border)", boxShadow: "0 0 40px rgba(124,58,237,0.08)" }}>
-              <span className="text-[10px] uppercase tracking-widest font-medium" style={{ color: "rgba(255,255,255,0.2)" }}>
+              className="w-full rounded-2xl border border-[#E2E8F0] dark:border-[#2D3748] bg-white dark:bg-[#1A1A1A] p-8 text-center cursor-pointer transition-all mb-4 min-h-[200px] flex flex-col items-center justify-center gap-3 hover:shadow-md"
+            >
+              <span className="text-[10px] uppercase tracking-widest font-medium text-[#CBD5E1] dark:text-[#4A5568]">
                 {flipped ? "BACK — click to flip" : "FRONT — click to reveal"}
               </span>
-              <p className="text-lg font-medium leading-relaxed" style={{ color: flipped ? "rgba(255,255,255,0.85)" : "rgba(255,255,255,0.75)" }}>
+              <p className="text-lg font-medium leading-relaxed text-[#111111] dark:text-white">
                 {flipped ? card.back : card.front}
               </p>
             </button>
 
             {flipped && (
               <div className="grid grid-cols-2 gap-2.5">
-                <button onClick={markStudying} className="btn-secondary"
-                  style={{ borderColor: "rgba(239,68,68,0.4)", color: "#fca5a5" }}>
+                <button onClick={markStudying} className="py-3 rounded-xl border border-red-200 dark:border-red-800 text-red-500 dark:text-red-400 text-sm font-semibold hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
                   Still Learning
                 </button>
-                <button onClick={markKnown} className="btn-secondary"
-                  style={{ borderColor: "rgba(34,197,94,0.4)", color: "#86efac" }}>
+                <button onClick={markKnown} className="py-3 rounded-xl border border-green-200 dark:border-green-800 text-green-600 dark:text-green-400 text-sm font-semibold hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors">
                   Got It ✓
                 </button>
               </div>
             )}
             {!flipped && (
-              <p className="text-center text-xs mt-2" style={{ color: "rgba(255,255,255,0.2)" }}>
-                Tap the card to reveal the answer
-              </p>
+              <p className="text-center text-xs mt-2 text-[#CBD5E1] dark:text-[#4A5568]">Tap the card to reveal the answer</p>
             )}
           </div>
         )}
 
         {/* Finished */}
         {finished && (
-          <div className="card-glow rounded-2xl p-8 text-center fade-up">
-            <div className="text-5xl mb-5">{known.size === cards.length ? "🏆" : known.size >= cards.length * 0.7 ? "👍" : "📚"}</div>
-            <p className="text-sm mb-1" style={{ color: "rgba(255,255,255,0.35)" }}>Session Complete</p>
-            <p className="text-6xl font-bold mb-1 text-gradient">{known.size}/{cards.length}</p>
-            <p className="text-sm mb-8" style={{ color: "rgba(255,255,255,0.4)" }}>cards marked as known</p>
-            <p className="text-sm mb-8" style={{ color: "rgba(255,255,255,0.5)" }}>
+          <div className="rounded-2xl border border-[#E2E8F0] dark:border-[#2D3748] bg-white dark:bg-[#1A1A1A] p-8 text-center shadow-sm">
+            <div className="text-5xl mb-5">
+              {known.size === cards.length ? "🏆" : known.size >= cards.length * 0.7 ? "👍" : "📚"}
+            </div>
+            <p className="text-sm text-[#94A3B8] mb-1">Session Complete</p>
+            <p className="text-6xl font-bold mb-1 text-[#111111] dark:text-white">{known.size}/{cards.length}</p>
+            <p className="text-sm text-[#94A3B8] mb-4">cards marked as known</p>
+            <p className="text-sm text-[#64748B] dark:text-[#94A3B8] mb-8">
               {known.size === cards.length ? "Perfect score! You know all of them."
                 : known.size >= cards.length * 0.7 ? "Great progress! Review the ones you missed."
                 : "Keep practicing — repetition is key!"}
             </p>
             <div className="grid gap-2.5">
-              <button onClick={generateCards} disabled={loading} className="btn-primary w-full">
-                {loading ? "Generating..." : "New Deck"}
+              <button onClick={generateCards} disabled={loading} className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#111111] dark:bg-white text-white dark:text-[#111111] py-3 text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-50">
+                {loading ? "Generating…" : "New Deck"}
               </button>
-              <button
-                onClick={saveDeck}
-                disabled={saving || saved}
-                className="btn-secondary w-full flex items-center justify-center gap-2 disabled:opacity-50"
-              >
-                <span className="material-symbols-outlined text-lg leading-none">{saved ? "bookmark_added" : "bookmark"}</span>
-                {saved ? "Saved to Library" : saving ? "Saving..." : "Save Deck"}
+              <button onClick={saveDeck} disabled={saving || saved} className="w-full flex items-center justify-center gap-2 rounded-xl border border-[#E2E8F0] dark:border-[#2D3748] text-[#64748B] dark:text-[#94A3B8] py-3 text-sm font-semibold hover:bg-[#F8FAFC] dark:hover:bg-[#222] transition-colors disabled:opacity-50">
+                {saved ? "Saved to Library ✓" : saving ? "Saving…" : "Save Deck"}
               </button>
-              <Link href={`/${subjectId}`} className="btn-secondary w-full text-center">Back to Subject</Link>
+              <Link href={`/subject/${subjectId}`} className="w-full rounded-xl border border-[#E2E8F0] dark:border-[#2D3748] text-[#64748B] dark:text-[#94A3B8] py-3 text-sm font-semibold text-center hover:bg-[#F8FAFC] dark:hover:bg-[#222] transition-colors block">
+                Back to Subject
+              </Link>
             </div>
           </div>
         )}

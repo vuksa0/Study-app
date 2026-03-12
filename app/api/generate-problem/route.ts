@@ -9,7 +9,7 @@ import type { TestDate } from "@/lib/test-date";
 const client = new Anthropic();
 
 export async function POST(req: NextRequest) {
-  const { subjectId, topicId, subjectName, topicName, topicDescription, difficulty = "medium", testDate } = await req.json();
+  const { subjectId, topicId, subjectName, topicName, topicDescription, difficulty = "medium", testDate, language = "English" } = await req.json();
   const urgency = urgencyPrompt(testDate as TestDate | null);
 
   let resolvedSubjectName: string;
