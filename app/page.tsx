@@ -10,6 +10,7 @@ import { subjects } from "@/lib/subjects";
 import { SmartLink } from "@/components/SmartLink";
 import Link from "next/link";
 import MotionButton from "@/components/ui/motion-button";
+import { FaqSection } from "@/components/FaqSection";
 
 export default function Home() {
   return (
@@ -559,6 +560,7 @@ export default function Home() {
         </div>
       </section>
 
+      <FaqSection />
       <Footer />
     </div>
   );
