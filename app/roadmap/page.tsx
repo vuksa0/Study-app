@@ -8,6 +8,7 @@ import { setTestDate } from "@/lib/test-date";
 import type { TestDate } from "@/lib/test-date";
 import { Navigation } from "@/components/Navigation";
 import { SUBJECT_ICON_MAP } from "@/components/SubjectIcons";
+import MotionButton from "@/components/ui/motion-button";
 
 const subjectItems = [
   { id: "mathematics",      name: "Mathematics"      },
@@ -95,22 +96,15 @@ export default function RoadmapPage() {
                 <h1 className="text-xl font-bold text-[#111111] dark:text-white mb-1">When do you have a test?</h1>
                 <p className="text-sm text-[#94A3B8] mb-6">Your study plan will be adjusted based on how much time you have.</p>
 
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-3">
                   {testDateOptions.map((opt) => (
-                    <button
-                      key={opt.value}
-                      onClick={() => handleTestDatePick(opt.value)}
-                      className="flex items-center justify-between w-full px-4 py-3.5 rounded-xl text-left border border-[#E2E8F0] dark:border-[#2D3748] hover:bg-[#111111] dark:hover:bg-white hover:border-[#111111] dark:hover:border-white hover:text-white dark:hover:text-[#111111] transition-all group"
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className="h-2 w-2 rounded-full bg-[#CBD5E1] dark:bg-[#4A5568] group-hover:bg-white dark:group-hover:bg-[#111111] transition-colors shrink-0" />
-                        <span className="text-sm font-semibold text-[#1E293B] dark:text-[#E2E8F0] group-hover:text-white dark:group-hover:text-[#111111] transition-colors">
-                          {opt.label}
-                          <span className="font-normal group-hover:text-white/80 dark:group-hover:text-[#111111]/70 text-[#94A3B8] transition-colors"> — {opt.sublabel}</span>
-                        </span>
-                      </div>
-                      <span className="opacity-0 group-hover:opacity-100 transition-opacity text-sm">→</span>
-                    </button>
+                    <div key={opt.value} className="flex flex-col gap-0.5">
+                      <p className="text-xs text-[#94A3B8] pl-1">{opt.sublabel}</p>
+                      <MotionButton
+                        label={opt.label}
+                        onClick={() => handleTestDatePick(opt.value)}
+                      />
+                    </div>
                   ))}
                 </div>
               </div>

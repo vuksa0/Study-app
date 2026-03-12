@@ -32,6 +32,11 @@
 .spinner-blade:nth-child(11) { transform: rotate(300deg) translateY(-130%); animation-delay: -0.833s; }
 .spinner-blade:nth-child(12) { transform: rotate(330deg) translateY(-130%); animation-delay: -0.75s;  }
 
+@theme inline {
+  --color-background: var(--bg-base);
+  --color-foreground: var(--fg-base);
+}
+
 @theme {
   --color-primary: #895af6;
   --color-primary-dark: #7c3aed;
@@ -53,11 +58,15 @@
 }
 
 :root {
+  --bg-base: #ffffff;
+  --fg-base: #111111;
   --brand: 262 83% 65%;
   --brand-foreground: 262 83% 75%;
 }
 
 .dark {
+  --bg-base: #111111;
+  --fg-base: #ffffff;
   --brand: 262 83% 75%;
   --brand-foreground: 262 83% 65%;
 }

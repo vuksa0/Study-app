@@ -8,6 +8,8 @@ import { PricingSection } from "@/components/blocks/pricing-section";
 import { FloatingShapes } from "@/components/ui/shape-landing-hero";
 import { subjects } from "@/lib/subjects";
 import { SmartLink } from "@/components/SmartLink";
+import Link from "next/link";
+import MotionButton from "@/components/ui/motion-button";
 
 export default function Home() {
   return (
@@ -52,21 +54,13 @@ export default function Home() {
           </p>
 
 
-          <div className="flex flex-col items-center justify-center gap-3 md:flex-row">
-            <SmartLink href="/subjects" className="group relative overflow-hidden rounded-full bg-[#111111] dark:bg-white px-8 h-12 flex items-center justify-center text-sm font-bold text-white dark:text-[#111111] w-full md:w-auto">
-              <span className="inline-block transition-all duration-300 group-hover:translate-x-12 group-hover:opacity-0">Get started</span>
-              <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center gap-2 text-white dark:text-[#111111] opacity-0 transition-all duration-300 group-hover:opacity-100 translate-x-12 group-hover:translate-x-0">
-                <span>Get started</span><ArrowRight className="h-4 w-4" />
-              </div>
-              <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-white/30 dark:bg-[#111111]/30 transition-all duration-300 group-hover:left-0 group-hover:top-0 group-hover:translate-y-0 group-hover:h-full group-hover:w-full group-hover:scale-[1.8] group-hover:bg-white/10" />
-            </SmartLink>
-            <SmartLink href="/upload" className="group relative overflow-hidden rounded-full border border-[#111111] dark:border-white bg-white dark:bg-transparent px-8 h-12 flex items-center justify-center text-sm font-bold text-[#111111] dark:text-white w-full md:w-auto">
-              <span className="inline-block transition-all duration-300 group-hover:translate-x-12 group-hover:opacity-0">Upload your notes</span>
-              <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center gap-2 text-white opacity-0 transition-all duration-300 group-hover:opacity-100 translate-x-12 group-hover:translate-x-0">
-                <span>Upload your notes</span><ArrowRight className="h-4 w-4" />
-              </div>
-              <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-[#111111] dark:bg-white transition-all duration-300 group-hover:left-0 group-hover:top-0 group-hover:translate-y-0 group-hover:h-full group-hover:w-full group-hover:scale-[1.8]" />
-            </SmartLink>
+          <div className="flex flex-col items-center justify-center gap-4 md:flex-row">
+            <Link href="/subjects">
+              <MotionButton label="Get started" />
+            </Link>
+            <Link href="/upload">
+              <MotionButton label="Upload your notes" />
+            </Link>
           </div>
         </div>
       </section>
@@ -291,13 +285,9 @@ export default function Home() {
               <p className="mb-8 max-w-md text-sm leading-relaxed text-[#94A3B8]">
                 Tell us your exam date and subject. Our AI builds a day-by-day plan with lessons, quizzes, and flashcards timed perfectly so you peak on exam day.
               </p>
-              <SmartLink
-                href="/roadmap"
-                className="inline-flex items-center gap-2 rounded-full bg-[#F59E0B] px-7 h-12 text-sm font-bold text-[#111111] transition-opacity hover:opacity-90"
-              >
-                Build my roadmap
-                <ArrowRight className="h-4 w-4" />
-              </SmartLink>
+              <Link href="/roadmap">
+                <MotionButton label="Build my roadmap" />
+              </Link>
             </div>
 
             {/* Right — Realistic Phone mockups */}
@@ -520,13 +510,9 @@ export default function Home() {
               <p className="mb-8 max-w-md text-sm leading-relaxed text-[#64748B] dark:text-[#94A3B8]">
                 Track your scores across every subject. Know exactly which topics need work and which ones you've mastered — so you study smarter, not harder.
               </p>
-              <SmartLink
-                href="/progress"
-                className="inline-flex items-center gap-2 rounded-full bg-[#111111] dark:bg-white px-7 h-12 text-sm font-bold text-white dark:text-[#111111] transition-opacity hover:opacity-80"
-              >
-                View my progress
-                <ArrowRight className="h-4 w-4" />
-              </SmartLink>
+              <Link href="/progress">
+                <MotionButton label="View my progress" />
+              </Link>
             </div>
           </div>
         </div>
@@ -560,21 +546,13 @@ export default function Home() {
             <h2 className="mb-8 text-3xl font-black text-white dark:text-[#111111] md:text-5xl">
               Ready to study smarter?
             </h2>
-            <div className="mb-6 flex flex-col items-center justify-center gap-3 md:flex-row">
-              <SmartLink href="/subjects" className="group relative overflow-hidden rounded-full bg-white dark:bg-[#111111] px-8 h-12 flex items-center justify-center text-sm font-bold text-[#111111] dark:text-white w-full md:w-auto">
-                <span className="inline-block transition-all duration-300 group-hover:translate-x-12 group-hover:opacity-0">Get started</span>
-                <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center gap-2 text-[#111111] dark:text-white opacity-0 transition-all duration-300 group-hover:opacity-100 translate-x-12 group-hover:translate-x-0">
-                  <span>Get started</span><ArrowRight className="h-4 w-4" />
-                </div>
-                <div className="absolute left-3 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-[#111111]/15 transition-all duration-300 group-hover:left-0 group-hover:top-0 group-hover:translate-y-0 group-hover:h-full group-hover:w-full group-hover:scale-[1.8] group-hover:bg-[#111111]/10" />
-              </SmartLink>
-              <SmartLink href="/subjects" className="group relative overflow-hidden rounded-full border border-white dark:border-[#111111] bg-transparent px-8 h-12 flex items-center justify-center text-sm font-bold text-white dark:text-[#111111] w-full md:w-auto">
-                <span className="inline-block transition-all duration-300 group-hover:translate-x-12 group-hover:opacity-0">Browse subjects</span>
-                <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center gap-2 text-white dark:text-[#111111] opacity-0 transition-all duration-300 group-hover:opacity-100 translate-x-12 group-hover:translate-x-0">
-                  <span>Browse subjects</span><ArrowRight className="h-4 w-4" />
-                </div>
-                <div className="absolute left-3 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-white/30 dark:bg-[#111111]/30 transition-all duration-300 group-hover:left-0 group-hover:top-0 group-hover:translate-y-0 group-hover:h-full group-hover:w-full group-hover:scale-[1.8]" />
-              </SmartLink>
+            <div className="mb-6 flex flex-col items-center justify-center gap-4 md:flex-row">
+              <Link href="/subjects">
+                <MotionButton label="Get started" />
+              </Link>
+              <Link href="/subjects">
+                <MotionButton label="Browse subjects" />
+              </Link>
             </div>
             <p className="text-sm text-[#94A3B8] dark:text-[#64748B]">No credit card required · Cancel anytime</p>
           </div>

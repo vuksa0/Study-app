@@ -3,6 +3,7 @@ import { Search } from "lucide-react";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { SUBJECT_ICON_MAP } from "@/components/SubjectIcons";
+import MotionButton from "@/components/ui/motion-button";
 import { SubjectShaderCard } from "@/components/SubjectShaderCard";
 
 const subjects = [
@@ -82,11 +83,8 @@ export default function Subjects() {
           <p className="mb-6 text-[#64748B] dark:text-[#94A3B8]">
             Upload your own notes and let AI create a custom study plan for any subject.
           </p>
-          <Link
-            href="/upload"
-            className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[#111111] dark:bg-white px-8 text-sm font-bold text-white dark:text-[#111111] hover:bg-[#111111]/90 dark:hover:bg-white/90"
-          >
-            Upload notes →
+          <Link href="/upload">
+            <MotionButton label="Upload notes" />
           </Link>
         </div>
       </div>

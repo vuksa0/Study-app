@@ -13,6 +13,7 @@ import { UserButton } from "@clerk/nextjs";
 import { SUBJECT_ICON_MAP } from "@/components/SubjectIcons";
 import { SubjectShaderCard } from "@/components/SubjectShaderCard";
 import { Navigation } from "@/components/Navigation";
+import MotionButton from "@/components/ui/motion-button";
 
 type Tab = "dashboard" | "lessons" | "quizzes" | "progress" | "settings";
 
@@ -144,9 +145,7 @@ export function DashboardClient({ firstName, totalCompleted, streak, weekly, wee
                     {weeklyPct >= 100 ? "You've crushed your weekly goals!" : weeklyPct > 0 ? `You've completed ${weeklyPct}% of your weekly goal.` : "Start studying to hit your weekly goals."}
                   </span>
                 </div>
-                <button onClick={() => setTab("lessons")} className="flex items-center gap-1 text-xs font-semibold text-violet-600 hover:text-violet-800">
-                  Start lesson <ChevronRight className="h-3.5 w-3.5" />
-                </button>
+                <MotionButton label="Start lesson" onClick={() => setTab("lessons")} classes="scale-75 origin-right" />
               </div>
 
               {/* 3-column layout */}
@@ -268,7 +267,7 @@ export function DashboardClient({ firstName, totalCompleted, streak, weekly, wee
                     ) : (
                       <div className="text-center py-5 border border-dashed border-gray-200 dark:border-[#1E293B] rounded-xl">
                         <p className="text-sm text-gray-400 dark:text-[#64748B] mb-2">No lessons started yet.</p>
-                        <button onClick={() => setTab("lessons")} className="text-xs font-semibold text-violet-600 hover:underline">Browse courses →</button>
+                        <MotionButton label="Browse courses" onClick={() => setTab("lessons")} classes="scale-75" />
                       </div>
                     )}
                   </div>
@@ -351,7 +350,7 @@ export function DashboardClient({ firstName, totalCompleted, streak, weekly, wee
                           </div>
                         </div>
                       </div>
-                      <Link href={q.href} className="px-4 py-1.5 bg-violet-600 text-white text-xs font-semibold rounded-lg hover:bg-violet-700 transition-colors">Start</Link>
+                      <Link href={q.href}><MotionButton label="Start quiz" classes="scale-75 origin-right" /></Link>
                     </div>
                   ))}
                 </div>
