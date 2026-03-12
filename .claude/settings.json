@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git push)",
+      "Bash(npx vercel ls)",
+      "Bash(git commit -m \"Redesign dashboard to match clean enterprise layout \\(Cake-style\\)\")"
+    ]
+  }
+}
