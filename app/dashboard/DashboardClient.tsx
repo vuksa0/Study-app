@@ -71,7 +71,7 @@ export function DashboardClient({ firstName, totalCompleted, streak, weekly, wee
   const filled = (weeklyPct / 100) * circ;
 
   return (
-    <div className="flex min-h-screen bg-[#F7F8FA]">
+    <div className="flex h-screen overflow-hidden bg-[#F7F8FA]">
 
       {/* ── Sidebar ── */}
       <aside className="w-56 flex-shrink-0 bg-white border-r border-gray-200 flex flex-col sticky top-0 h-screen overflow-y-auto">
