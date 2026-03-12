@@ -8,6 +8,7 @@ import { setTestDate } from "@/lib/test-date";
 import type { TestDate } from "@/lib/test-date";
 import { Navigation } from "@/components/Navigation";
 import { SUBJECT_ICON_MAP } from "@/components/SubjectIcons";
+import { SubjectShaderCard } from "@/components/SubjectShaderCard";
 import MotionButton from "@/components/ui/motion-button";
 
 const subjectItems = [
@@ -58,17 +59,28 @@ export default function RoadmapPage() {
                 <h1 className="text-xl font-bold text-[#111111] dark:text-white mb-1">Pick a subject</h1>
                 <p className="text-sm text-[#94A3B8] mb-6">Choose what you want to study for.</p>
 
-                <div className="grid grid-cols-2 gap-2">
-                  {subjectItems.map((s) => (
-                    <button
-                      key={s.id}
-                      onClick={() => { setSelectedSubject(s.id); setStep("date"); }}
-                      className="flex items-center gap-3 px-4 py-3 rounded-xl text-left font-medium text-sm text-[#1E293B] dark:text-[#E2E8F0] border border-[#E2E8F0] dark:border-[#2D3748] hover:border-[#CBD5E1] dark:hover:border-[#4A5568] hover:bg-[#F8FAFC] dark:hover:bg-[#252525] transition-all"
-                    >
-                      {(() => { const def = SUBJECT_ICON_MAP[s.id]; return def ? <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg" style={{ background: `${def.color}18`, color: def.color }}><def.Icon className="h-4 w-4" /></span> : null; })()}
-                      {s.name}
-                    </button>
-                  ))}
+                <div className="grid grid-cols-2 gap-3">
+                  {subjectItems.map((s) => {
+                    const def = SUBJECT_ICON_MAP[s.id];
+                    return (
+                      <button
+                        key={s.id}
+                        onClick={() => { setSelectedSubject(s.id); setStep("date"); }}
+                        className="group relative overflow-hidden rounded-2xl text-left transition-all hover:shadow-lg"
+                        style={{ minHeight: 120 }}
+                      >
+                        <SubjectShaderCard subjectId={s.id} />
+                        <div className="relative z-10 flex flex-col p-4 h-full" style={{ minHeight: 120 }}>
+                          {def && (
+                            <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-xl" style={{ background: "rgba(255,255,255,0.15)", color: "#fff" }}>
+                              <def.Icon className="h-4 w-4" />
+                            </div>
+                          )}
+                          <span className="mt-auto text-sm font-bold text-white">{s.name}</span>
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </>
