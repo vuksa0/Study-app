@@ -434,35 +434,54 @@ function UploadContent() {
   }
 
   async function handleGenerate() {
-    if (!files.length) { setError("Upload at least one file first."); return; }
+    if (!subject && !files.length) { setError("Pick a subject or upload a file first."); return; }
     setError("");
     setStep("generating");
 
-    const fd = new FormData();
-    fd.append("mode", mode);
-    fd.append("count", String(count));
-    if (subject) fd.append("subject", subject.name);
-    if (selectedTopics.size > 0) {
-      const topicNames = subject?.topics.filter((t) => selectedTopics.has(t.id)).map((t) => t.name) ?? [];
-      fd.append("topics", topicNames.join(", "));
-    }
-    files.forEach((f) => fd.append("files", f));
+    const subjectLabel = subject?.name ?? (files.length ? files.map((f) => f.name).join(", ") : "Custom");
+    const topicIds = subject ? Array.from(selectedTopics) : [];
+    const firstTopicId = topicIds[0] ?? null;
 
     try {
-      const res = await fetch("/api/generate-from-file", { method: "POST", body: fd });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let data: any;
-      try {
-        data = await res.json();
-      } catch {
-        throw new Error(`Server error (${res.status}). Please try again.`);
+
+      if (files.length) {
+        // ── Upload path: send files to generate-from-file ──────────────────
+        const fd = new FormData();
+        fd.append("mode", mode);
+        fd.append("count", String(count));
+        if (subject) fd.append("subject", subject.name);
+        if (topicIds.length > 0) {
+          const topicNames = subject?.topics.filter((t) => selectedTopics.has(t.id)).map((t) => t.name) ?? [];
+          fd.append("topics", topicNames.join(", "));
+        }
+        files.forEach((f) => fd.append("files", f));
+        const res = await fetch("/api/generate-from-file", { method: "POST", body: fd });
+        try { data = await res.json(); } catch { throw new Error(`Server error (${res.status}). Please try again.`); }
+        if (!res.ok) throw new Error(typeof data.error === "string" ? data.error : (data.error?.message ?? "Generation failed"));
+      } else {
+        // ── No-upload path: use subject-based APIs directly ─────────────────
+        const body = {
+          subjectId: subject!.id,
+          topicId: firstTopicId,
+          subjectName: subject!.name,
+          topicName: firstTopicId ? subject!.topics.find((t) => t.id === firstTopicId)?.name : null,
+          topicDescription: firstTopicId ? subject!.topics.find((t) => t.id === firstTopicId)?.description : null,
+          count,
+        };
+        const apiRoute =
+          mode === "quiz"       ? "/api/generate-quiz"       :
+          mode === "flashcards" ? "/api/generate-flashcards" :
+          mode === "problems"   ? "/api/generate-problem"    :
+                                  "/api/generate-lesson";
+        const res = await fetch(apiRoute, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+        try { data = await res.json(); } catch { throw new Error(`Server error (${res.status}). Please try again.`); }
+        if (!res.ok) throw new Error(data.error ?? "Generation failed");
+        // generate-problem returns a single problem; wrap it for consistency
+        if (mode === "problems" && data.problem) data.problems = [data.problem];
       }
-      if (!res.ok) {
-        const msg = typeof data.error === "string" ? data.error : (data.error?.message ?? "Generation failed");
-        throw new Error(msg);
-      }
-      const fileLabel = files.map((f) => f.name).join(", ");
-      const subjectLabel = subject?.name ?? fileLabel;
+
       if (mode === "quiz") {
         setQuestions(data.questions ?? []);
         setQuizCurrent(0); setQuizSelected(null); setQuizRevealed(false);
@@ -609,7 +628,7 @@ function UploadContent() {
             <p className="font-bold text-[#111111] dark:text-white">
               {files.length ? `${files.length} file${files.length > 1 ? "s" : ""} selected` : "Drop PDF or paste text here"}
             </p>
-            <p className="mt-1 text-sm text-[#94A3B8]">Click to browse · Max 20MB</p>
+            <p className="mt-1 text-sm text-[#94A3B8]">Optional — skip to generate from subject only · Max 20MB</p>
           </div>
           <InteractiveHoverButton
             text="Select File"
@@ -683,7 +702,7 @@ function UploadContent() {
         {error && <p className="mb-3 text-sm text-red-500">{error}</p>}
         <button
           onClick={handleGenerate}
-          disabled={!files.length}
+          disabled={!subject && !files.length}
           className="group relative w-full h-14 overflow-hidden rounded-full border border-[#111111] bg-[#111111] text-white font-bold text-base transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           <span className="inline-block transition-all duration-300 group-hover:translate-x-12 group-hover:opacity-0 group-disabled:translate-x-0 group-disabled:opacity-100">
