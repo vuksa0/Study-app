@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(vercel deploy --prod)",
+      "Bash(npx tsc --noEmit)",
+      "Bash(npm run build)",
+      "Bash(ls -la c:/Users/vukzi/kviz-app/*.ts c:/Users/vukzi/kviz-app/*.tsx)",
+      "Bash(git add -A)",
+      "Bash(git commit -m \"Add Warp shader background to all subject cards\")"
+    ]
+  }
+}

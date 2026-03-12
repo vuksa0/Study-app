@@ -7,8 +7,11 @@ import type { Subject, Topic } from "@/lib/subjects";
 import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
 import { useState, useEffect, useRef, Suspense, useCallback } from "react";
+import { useAuth } from "@clerk/nextjs";
 import { BottomNav } from "@/components/ui/bottom-nav";
 import { Spinner } from "@/components/ui/ios-spinner";
+import { MathText } from "@/components/ui/math-text";
+import * as math from "mathjs";
 
 interface Problem {
   problem: string;
@@ -65,6 +68,12 @@ function ProblemsContent() {
 
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [submittedImageBase64, setSubmittedImageBase64] = useState<string | undefined>(undefined);
+  const [submittedImageType, setSubmittedImageType] = useState<string | undefined>(undefined);
+  const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const { isSignedIn } = useAuth();
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -95,6 +104,9 @@ function ProblemsContent() {
     setShowSteps(false);
     setImageFile(null);
     setImagePreview(null);
+    setSubmittedImageBase64(undefined);
+    setSubmittedImageType(undefined);
+    setSaved(false);
 
     try {
       const res = await fetch("/api/generate-problem", {
@@ -135,6 +147,40 @@ function ProblemsContent() {
         setUserAnswer((prev) => prev.slice(0, start) + prev.slice(end));
         cursorPos.current = { start, end: start };
       }
+    } else if (value === "=") {
+      // Try to evaluate the expression before cursor
+      setUserAnswer((prev) => {
+        const expr = prev.slice(0, start);
+        const after = prev.slice(end);
+        // Normalize math symbols for mathjs
+        const normalized = expr
+          .replace(/×/g, "*").replace(/÷/g, "/").replace(/−/g, "-")
+          .replace(/²/g, "^2").replace(/³/g, "^3").replace(/√/g, "sqrt")
+          .replace(/π/g, "pi").replace(/∛/g, "cbrt");
+        try {
+          const result = math.evaluate(normalized);
+          const resultStr = typeof result === "number"
+            ? (Number.isInteger(result) ? String(result) : String(math.format(result, { precision: 10 })))
+            : String(result);
+          const newVal = expr + " = " + resultStr + after;
+          const newPos = (expr + " = " + resultStr).length;
+          cursorPos.current = { start: newPos, end: newPos };
+          return newVal;
+        } catch {
+          // Not a computable expression — just insert "="
+          const newVal = prev.slice(0, start) + "=" + after;
+          cursorPos.current = { start: start + 1, end: start + 1 };
+          return newVal;
+        }
+      });
+      setTimeout(() => {
+        const ta = textareaRef.current;
+        if (ta) {
+          ta.focus();
+          ta.setSelectionRange(cursorPos.current.start, cursorPos.current.end);
+        }
+      }, 0);
+      return;
     } else {
       setUserAnswer((prev) => prev.slice(0, start) + value + prev.slice(end));
       cursorPos.current = { start: start + value.length, end: start + value.length };
@@ -181,6 +227,8 @@ function ProblemsContent() {
       bytes.forEach((b) => (binary += String.fromCharCode(b)));
       imageBase64 = btoa(binary);
       imageType = imageFile.type;
+      setSubmittedImageBase64(imageBase64);
+      setSubmittedImageType(imageType);
     }
 
     try {
@@ -203,6 +251,31 @@ function ProblemsContent() {
     } finally {
       setChecking(false);
     }
+  }
+
+  async function saveProblem() {
+    if (!isSignedIn || !subject || !problem || !result || saving || saved) return;
+    setSaving(true);
+    try {
+      await fetch("/api/library", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "problems",
+          subject_id: subjectId,
+          subject_name: subject.name,
+          title: `${subject.name}${topic ? ` · ${topic.name}` : ""} Problem`,
+          data: {
+            problem,
+            userAnswer,
+            result,
+            imageBase64: submittedImageBase64,
+            imageType: submittedImageType,
+          },
+        }),
+      });
+      setSaved(true);
+    } catch { /* silent */ } finally { setSaving(false); }
   }
 
   if (!subject) return null;
@@ -247,9 +320,9 @@ function ProblemsContent() {
                     className="flex-1 py-2.5 rounded-xl text-sm font-semibold capitalize transition-all"
                     style={{
                       border: "1px solid",
-                      borderColor: difficulty === d ? "rgba(139,92,246,0.5)" : "var(--border)",
-                      background: difficulty === d ? "rgba(139,92,246,0.12)" : "transparent",
-                      color: difficulty === d ? "#c4b5fd" : "rgba(255,255,255,0.4)",
+                      borderColor: difficulty === d ? "rgba(255,255,255,0.6)" : "var(--border)",
+                      background: difficulty === d ? "rgba(255,255,255,0.1)" : "transparent",
+                      color: difficulty === d ? "#ffffff" : "rgba(255,255,255,0.4)",
                     }}>
                     {d}
                   </button>
@@ -288,20 +361,20 @@ function ProblemsContent() {
               <p className="text-xs font-medium mb-3 tracking-wider" style={{ color: "rgba(255,255,255,0.3)" }}>
                 PROBLEM · <span className="capitalize">{difficulty}</span>
               </p>
-              <p className="text-base leading-relaxed font-medium text-white/85">{problem.problem}</p>
+              <MathText className="text-base leading-relaxed font-medium text-white/85">{problem.problem}</MathText>
             </div>
 
             {/* Hint */}
             {!showHint ? (
               <button onClick={() => setShowHint(true)}
                 className="text-sm px-4 py-2 rounded-lg transition-all"
-                style={{ color: "#a78bfa", border: "1px solid rgba(139,92,246,0.2)", background: "rgba(139,92,246,0.06)" }}>
+                style={{ color: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.05)" }}>
                 💡 Show hint
               </button>
             ) : (
-              <div className="rounded-xl px-4 py-3 text-sm" style={{ background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.2)" }}>
-                <span className="font-semibold mr-2" style={{ color: "#a78bfa" }}>Hint</span>
-                <span style={{ color: "rgba(255,255,255,0.6)" }}>{problem.hint}</span>
+              <div className="rounded-xl px-4 py-3 text-sm" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)" }}>
+                <span className="font-semibold mr-2" style={{ color: "rgba(255,255,255,0.7)" }}>Hint</span>
+                <MathText style={{ color: "rgba(255,255,255,0.6)" }}>{problem.hint}</MathText>
               </div>
             )}
 
@@ -389,7 +462,7 @@ function ProblemsContent() {
                     onClick={() => fileInputRef.current?.click()}
                     className="flex items-center gap-2 text-sm px-4 py-3 rounded-xl w-full justify-center transition-all"
                     style={{ border: "1px dashed rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.35)" }}
-                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(139,92,246,0.4)"; (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.65)"; }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.3)"; (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.65)"; }}
                     onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.12)"; (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.35)"; }}>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
@@ -427,17 +500,17 @@ function ProblemsContent() {
                 <div>
                   <p className="font-semibold text-white/90">{result.correct ? "Correct!" : "Not quite"}</p>
                   <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.35)" }}>
-                    Answer: <span className="font-mono" style={{ color: "#c4b5fd" }}>{result.correctAnswer}</span>
+                    Answer: <MathText className="font-mono" style={{ color: "rgba(255,255,255,0.8)" }}>{result.correctAnswer}</MathText>
                   </p>
                 </div>
               </div>
-              <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>{result.feedback}</p>
+              <MathText className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>{result.feedback}</MathText>
             </div>
 
             {/* Problem recap */}
             <div className="rounded-xl px-4 py-3 text-sm" style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}>
               <p className="text-xs font-medium mb-1 tracking-wider" style={{ color: "rgba(255,255,255,0.25)" }}>PROBLEM</p>
-              <p style={{ color: "rgba(255,255,255,0.5)" }}>{problem.problem}</p>
+              <MathText style={{ color: "rgba(255,255,255,0.5)" }}>{problem.problem}</MathText>
             </div>
 
             {/* Step-by-step */}
@@ -445,7 +518,7 @@ function ProblemsContent() {
               <button
                 onClick={() => setShowSteps((v) => !v)}
                 className="flex items-center justify-between gap-2 text-sm px-4 py-3 rounded-xl w-full transition-all"
-                style={{ background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.2)", color: "#c4b5fd" }}>
+                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.7)" }}>
                 <span>Step-by-step solution</span>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
                   style={{ transform: showSteps ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>
@@ -454,18 +527,18 @@ function ProblemsContent() {
               </button>
 
               {showSteps && (
-                <div className="mt-2 rounded-xl overflow-hidden" style={{ border: "1px solid rgba(139,92,246,0.15)" }}>
+                <div className="mt-2 rounded-xl overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.1)" }}>
                   {result.steps.map((step, i) => (
                     <div key={i} className="px-4 py-3 text-sm flex gap-3 items-start"
                       style={{
-                        background: i % 2 === 0 ? "rgba(139,92,246,0.05)" : "transparent",
-                        borderBottom: i < result.steps.length - 1 ? "1px solid rgba(139,92,246,0.08)" : "none",
+                        background: i % 2 === 0 ? "rgba(255,255,255,0.03)" : "transparent",
+                        borderBottom: i < result.steps.length - 1 ? "1px solid rgba(255,255,255,0.06)" : "none",
                       }}>
                       <span className="shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold mt-0.5"
-                        style={{ background: "rgba(139,92,246,0.2)", color: "#a78bfa" }}>
+                        style={{ background: "rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.7)" }}>
                         {i + 1}
                       </span>
-                      <span style={{ color: "rgba(255,255,255,0.7)" }}>{step}</span>
+                      <MathText style={{ color: "rgba(255,255,255,0.7)" }}>{step}</MathText>
                     </div>
                   ))}
                 </div>
@@ -478,6 +551,15 @@ function ProblemsContent() {
                 {loading ? "Generating…" : "Next Problem"}
               </button>
             </div>
+            <button
+              onClick={saveProblem}
+              disabled={saving || saved}
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold transition-all disabled:opacity-50"
+              style={{ border: "1px solid rgba(255,255,255,0.12)", color: saved ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.4)" }}
+            >
+              <span className="material-symbols-outlined text-lg leading-none">{saved ? "bookmark_added" : "bookmark"}</span>
+              {saved ? "Saved to Library" : saving ? "Saving..." : "Save Problem & Answer"}
+            </button>
           </div>
         )}
       </div>

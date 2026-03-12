@@ -5,13 +5,16 @@ const isPublic = createRouteMatcher([
   "/login(.*)",
   "/get-started(.*)",
   "/subjects(.*)",
+  "/learn(.*)",
+  "/progress(.*)",
+  "/roadmap(.*)",
   "/subscription(.*)",
   "/create(.*)",
   "/api/chat(.*)",
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
-  if (!isPublic(req)) await auth.protect();
+  if (!isPublic(req)) await auth.protect({ unauthenticatedUrl: new URL("/login", req.url).toString() });
 });
 
 export const config = {

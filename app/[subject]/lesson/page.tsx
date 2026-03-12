@@ -7,6 +7,7 @@ import type { Subject, Topic } from "@/lib/subjects";
 import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
 import { useState, useEffect, Suspense } from "react";
+import { useAuth } from "@clerk/nextjs";
 import { BottomNav } from "@/components/ui/bottom-nav";
 
 interface Lesson {
@@ -23,12 +24,34 @@ function LessonContent() {
   const subjectId = params.subject as string;
   const topicId = searchParams.get("topic") ?? undefined;
 
+  const { isSignedIn } = useAuth();
   const [subject, setSubject] = useState<Subject | null>(null);
   const [topic, setTopic] = useState<Topic | null>(null);
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [selectedTopic, setSelectedTopic] = useState<string | undefined>(topicId);
+  const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  async function saveLesson() {
+    if (!isSignedIn || !subject || !lesson || saving || saved) return;
+    setSaving(true);
+    try {
+      await fetch("/api/library", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "lesson",
+          subject_id: subjectId,
+          subject_name: subject.name,
+          title: lesson.title,
+          data: { lesson },
+        }),
+      });
+      setSaved(true);
+    } catch { /* silent */ } finally { setSaving(false); }
+  }
 
   useEffect(() => {
     const builtin = getSubject(subjectId);
@@ -114,9 +137,9 @@ function LessonContent() {
                   className="py-2.5 px-3 rounded-xl text-sm font-medium transition-all text-left"
                   style={{
                     border: "1px solid",
-                    borderColor: selectedTopic === undefined ? "rgba(139,92,246,0.5)" : "var(--border)",
-                    background: selectedTopic === undefined ? "rgba(139,92,246,0.12)" : "transparent",
-                    color: selectedTopic === undefined ? "#c4b5fd" : "rgba(255,255,255,0.4)",
+                    borderColor: selectedTopic === undefined ? "rgba(255,255,255,0.6)" : "var(--border)",
+                    background: selectedTopic === undefined ? "rgba(255,255,255,0.1)" : "transparent",
+                    color: selectedTopic === undefined ? "#ffffff" : "rgba(255,255,255,0.4)",
                   }}>
                   All topics
                 </button>
@@ -126,9 +149,9 @@ function LessonContent() {
                     className="py-2.5 px-3 rounded-xl text-sm font-medium transition-all text-left"
                     style={{
                       border: "1px solid",
-                      borderColor: selectedTopic === t.id ? "rgba(139,92,246,0.5)" : "var(--border)",
-                      background: selectedTopic === t.id ? "rgba(139,92,246,0.12)" : "transparent",
-                      color: selectedTopic === t.id ? "#c4b5fd" : "rgba(255,255,255,0.4)",
+                      borderColor: selectedTopic === t.id ? "rgba(255,255,255,0.6)" : "var(--border)",
+                      background: selectedTopic === t.id ? "rgba(255,255,255,0.1)" : "transparent",
+                      color: selectedTopic === t.id ? "#ffffff" : "rgba(255,255,255,0.4)",
                     }}>
                     {t.name}
                   </button>
@@ -180,8 +203,8 @@ function LessonContent() {
             </div>
 
             {/* Summary */}
-            <div className="rounded-xl p-5" style={{ background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.2)" }}>
-              <h2 className="font-semibold text-violet-300 mb-2 text-sm">Key Takeaways</h2>
+            <div className="rounded-xl p-5" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)" }}>
+              <h2 className="font-semibold text-white/70 mb-2 text-sm">Key Takeaways</h2>
               <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>{lesson.summary}</p>
             </div>
 
@@ -204,7 +227,7 @@ function LessonContent() {
 
             {/* Actions */}
             <div className="grid grid-cols-2 gap-2.5 pt-2">
-              <button onClick={() => { setLesson(null); }} className="btn-secondary">
+              <button onClick={() => { setLesson(null); setSaved(false); }} className="btn-secondary">
                 New Lesson
               </button>
               <Link href={`/${subjectId}/quiz${selectedTopic ? `?topic=${selectedTopic}` : ""}`} className="btn-primary">
@@ -214,6 +237,15 @@ function LessonContent() {
                 </svg>
               </Link>
             </div>
+            <button
+              onClick={saveLesson}
+              disabled={saving || saved}
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold transition-all disabled:opacity-50"
+              style={{ border: "1px solid rgba(255,255,255,0.12)", color: saved ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.4)" }}
+            >
+              <span className="material-symbols-outlined text-lg leading-none">{saved ? "bookmark_added" : "bookmark"}</span>
+              {saved ? "Saved to Library" : saving ? "Saving..." : "Save Lesson"}
+            </button>
           </div>
         )}
       </div>

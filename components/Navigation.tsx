@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { Menu, X, Sun, Moon } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Sun, Moon, ChevronDown, BookOpen, Brain, Zap, PenTool, Code2, FileText, Map } from "lucide-react";
+import { SUBJECT_ICON_MAP } from "@/components/SubjectIcons";
+import { useState, useEffect, useRef } from "react";
 import { useTheme } from "next-themes";
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import { UserButton, Show } from "@clerk/nextjs";
@@ -11,11 +12,44 @@ import { CreditCard } from "lucide-react";
 import { ThinkioLogo } from "@/components/ThinkioLogo";
 
 export function Navigation() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [subjectsOpen, setSubjectsOpen] = useState(false);
+  const [featuresOpen, setFeaturesOpen] = useState(false);
+  const subjectsRef = useRef<HTMLDivElement>(null);
+  const featuresRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => setMounted(true), []);
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (subjectsRef.current && !subjectsRef.current.contains(e.target as Node)) {
+        setSubjectsOpen(false);
+      }
+      if (featuresRef.current && !featuresRef.current.contains(e.target as Node)) {
+        setFeaturesOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  const subjectItems = Object.entries(SUBJECT_ICON_MAP).map(([id, def]) => ({
+    id,
+    name: { mathematics: "Mathematics", physics: "Physics", chemistry: "Chemistry", history: "History", biology: "Biology", geography: "Geography", english: "English", "computer-science": "Computer Science" }[id] ?? id,
+    color: def.color,
+    Icon: def.Icon,
+  }));
+
+  const featureItems = [
+    { href: "/learn", icon: <BookOpen className="h-4 w-4" />, color: "#6366F1", label: "Learn", desc: "Structured AI-generated lessons" },
+    { href: "#quizzes", icon: <Brain className="h-4 w-4" />, color: "#8B5CF6", label: "Quizzes", desc: "Test your knowledge fast" },
+    { href: "#flashcards", icon: <Zap className="h-4 w-4" />, color: "#F59E0B", label: "Flashcards", desc: "Active recall & spaced repetition" },
+    { href: "#problems", icon: <PenTool className="h-4 w-4" />, color: "#10B981", label: "Problems", desc: "Practice with worked solutions" },
+    { href: "#coding", icon: <Code2 className="h-4 w-4" />, color: "#F97316", label: "Coding", desc: "Write & run code challenges" },
+    { href: "#essay", icon: <FileText className="h-4 w-4" />, color: "#3B82F6", label: "Essay", desc: "AI-graded writing practice" },
+    { href: "/roadmap", icon: <Map className="h-4 w-4" />, color: "#EC4899", label: "Roadmap", desc: "Personalized study plan" },
+  ];
 
   const isDark = theme === "dark";
 
@@ -29,11 +63,50 @@ export function Navigation() {
 
         {/* Desktop Navigation */}
         <div className="hidden items-center gap-2 md:flex">
+          {/* Features dropdown */}
+          <div className="relative" ref={featuresRef}>
+            <button
+              onClick={() => { setFeaturesOpen((o) => !o); setSubjectsOpen(false); }}
+              className="rounded-full border border-[#E2E8F0] dark:border-[#2D3748] px-4 py-1.5 text-sm text-[#64748B] dark:text-[#94A3B8] hover:border-[#111111] dark:hover:border-white hover:text-[#111111] dark:hover:text-white transition-colors flex items-center gap-1"
+            >
+              Features
+              <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${featuresOpen ? "rotate-180" : ""}`} />
+            </button>
+
+            <div className={`absolute top-full left-1/2 -translate-x-1/2 mt-2 w-72 rounded-2xl bg-white dark:bg-[#1a1a1a] border border-[#E2E8F0] dark:border-[#2D3748] shadow-xl shadow-black/10 dark:shadow-black/40 z-50 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${featuresOpen ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 -translate-y-1 pointer-events-none"}`}>
+              <div className={`grid transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${featuresOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
+                <div className="overflow-hidden">
+                  <div className="px-4 pt-4 pb-2">
+                    <p className="text-xs font-medium text-[#94A3B8] uppercase tracking-wide">All features</p>
+                  </div>
+                  <div className="px-2 pb-3">
+                    {featureItems.map((f, index) => (
+                      <Link
+                        key={f.label}
+                        href={f.href}
+                        onClick={() => setFeaturesOpen(false)}
+                        className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-xl hover:bg-[#F8FAFC] dark:hover:bg-[#252525] transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] group ${featuresOpen ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}`}
+                        style={{ transitionDelay: featuresOpen ? `${index * 50}ms` : "0ms" }}
+                      >
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg" style={{ background: `${f.color}18`, color: f.color }}>
+                          {f.icon}
+                        </span>
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-[#1E293B] dark:text-[#E2E8F0] group-hover:text-[#111111] dark:group-hover:text-white transition-colors">{f.label}</p>
+                          <p className="text-xs text-[#94A3B8] truncate">{f.desc}</p>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {[
-            { href: "/#features", label: "Features" },
             { href: "/#how-it-works", label: "How it works" },
             { href: "/#pricing", label: "Pricing" },
-            { href: "/subjects", label: "Subjects" },
+            { href: "/progress", label: "Progress" },
           ].map(({ href, label }) => (
             <Link
               key={href}
@@ -43,90 +116,81 @@ export function Navigation() {
               {label}
             </Link>
           ))}
+
+          {/* Subjects dropdown */}
+          <div className="relative" ref={subjectsRef}>
+            <button
+              onClick={() => { setSubjectsOpen((o) => !o); setFeaturesOpen(false); }}
+              className="rounded-full border border-[#E2E8F0] dark:border-[#2D3748] px-4 py-1.5 text-sm text-[#64748B] dark:text-[#94A3B8] hover:border-[#111111] dark:hover:border-white hover:text-[#111111] dark:hover:text-white transition-colors flex items-center gap-1"
+            >
+              Subjects
+              <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${subjectsOpen ? "rotate-180" : ""}`} />
+            </button>
+
+            <div className={`absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 rounded-2xl bg-white dark:bg-[#1a1a1a] border border-[#E2E8F0] dark:border-[#2D3748] shadow-xl shadow-black/10 dark:shadow-black/40 z-50 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${subjectsOpen ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 -translate-y-1 pointer-events-none"}`}>
+              <div className={`grid transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${subjectsOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
+                <div className="overflow-hidden">
+                  <div className="px-4 pt-4 pb-2">
+                    <p className="text-xs font-medium text-[#94A3B8] uppercase tracking-wide">All subjects</p>
+                  </div>
+                  <div className="px-2 pb-3">
+                    {subjectItems.map((s, index) => (
+                      <Link
+                        key={s.id}
+                        href={`/subject/${s.id}`}
+                        onClick={() => setSubjectsOpen(false)}
+                        className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-xl hover:bg-[#F8FAFC] dark:hover:bg-[#252525] transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] group ${subjectsOpen ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}`}
+                        style={{ transitionDelay: subjectsOpen ? `${index * 50}ms` : "0ms" }}
+                      >
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg" style={{ background: `${s.color}18`, color: s.color }}>
+                          <s.Icon className="h-4 w-4" />
+                        </span>
+                        <span className="text-sm font-medium text-[#1E293B] dark:text-[#E2E8F0] group-hover:text-[#111111] dark:group-hover:text-white transition-colors">
+                          {s.name}
+                        </span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
 
-        {/* Desktop Buttons */}
-        <div className="hidden items-center gap-3 md:flex">
+        {/* Right side — always visible */}
+        <div className="flex items-center gap-3">
           {mounted && (
             <button
               onClick={() => setTheme(isDark ? "light" : "dark")}
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-[#E2E8F0] dark:border-[#2D3748] text-[#64748B] dark:text-[#94A3B8] hover:border-[#111111] dark:hover:border-white hover:text-[#111111] dark:hover:text-white transition-colors"
               aria-label="Toggle theme"
+              className="relative flex h-7 w-14 items-center rounded-full border border-[#E2E8F0] dark:border-[#2D3748] bg-[#F1F5F9] dark:bg-[#1A1A1A] transition-colors duration-300"
             >
-              {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              <span className={`absolute flex h-5 w-5 items-center justify-center rounded-full bg-white dark:bg-[#111111] shadow-sm transition-all duration-300 ${isDark ? "left-[30px]" : "left-[2px]"}`}>
+                {isDark ? <Sun className="h-3 w-3 text-[#F59E0B]" /> : <Moon className="h-3 w-3 text-[#64748B]" />}
+              </span>
             </button>
           )}
           <Show when="signed-out">
-            <Link href="/login" className="text-sm text-[#111111] dark:text-white hover:text-[#64748B] dark:hover:text-[#94A3B8] transition-colors">Log in</Link>
-            <Link href="/get-started">
+            <Link href="/login" className="hidden text-sm text-[#111111] dark:text-white hover:text-[#64748B] dark:hover:text-[#94A3B8] transition-colors md:block">Log in</Link>
+            <Link href="/login" className="hidden md:block">
               <InteractiveHoverButton text="Get started" className="h-9 py-0" />
             </Link>
+            <Link href="/login" className="text-sm font-semibold text-[#111111] dark:text-white md:hidden">Log in</Link>
           </Show>
           <Show when="signed-in">
+            <Link href="/dashboard" className="hidden md:flex items-center gap-1.5 rounded-full border border-[#E2E8F0] dark:border-[#2D3748] px-4 py-1.5 text-sm text-[#64748B] dark:text-[#94A3B8] hover:border-[#111111] dark:hover:border-white hover:text-[#111111] dark:hover:text-white transition-colors">
+              Dashboard
+            </Link>
             <UserButton>
               <UserButton.UserProfilePage label="Subscription" url="subscription" labelIcon={<CreditCard size={16} />}>
                 <SubscriptionTab />
               </UserButton.UserProfilePage>
             </UserButton>
           </Show>
-        </div>
-
-        {/* Mobile right side */}
-        <div className="flex items-center gap-2 md:hidden">
-          {mounted && (
-            <button
-              onClick={() => setTheme(isDark ? "light" : "dark")}
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-[#E2E8F0] dark:border-[#2D3748] text-[#64748B] dark:text-[#94A3B8]"
-              aria-label="Toggle theme"
-            >
-              {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-            </button>
-          )}
-          <Show when="signed-in">
-            <UserButton>
-              <UserButton.UserProfilePage label="Subscription" url="subscription" labelIcon={<CreditCard size={16} />}>
-                <SubscriptionTab />
-              </UserButton.UserProfilePage>
-            </UserButton>
-          </Show>
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle menu"
-            className="text-[#111111] dark:text-white"
-          >
-            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </button>
         </div>
       </div>
 
-      {/* Mobile Menu */}
-      {mobileMenuOpen && (
-        <div className="border-t border-[#E2E8F0] dark:border-[#2D3748] bg-white dark:bg-[#111111] px-6 py-4 md:hidden">
-          <div className="flex flex-col gap-4">
-            {[
-              { href: "/#features", label: "Features" },
-              { href: "/#how-it-works", label: "How it works" },
-              { href: "/#pricing", label: "Pricing" },
-              { href: "/subjects", label: "Subjects" },
-            ].map(({ href, label }) => (
-              <Link
-                key={href}
-                href={href}
-                onClick={() => setMobileMenuOpen(false)}
-                className="rounded-full border border-[#E2E8F0] dark:border-[#2D3748] px-4 py-1.5 text-sm text-[#64748B] dark:text-[#94A3B8] text-center hover:border-[#111111] dark:hover:border-white hover:text-[#111111] dark:hover:text-white transition-colors"
-              >
-                {label}
-              </Link>
-            ))}
-            <Show when="signed-out">
-              <Link href="/login" className="text-sm text-[#111111] dark:text-white">Log in</Link>
-              <Link href="/get-started" onClick={() => setMobileMenuOpen(false)}>
-                <InteractiveHoverButton text="Get started" className="w-full justify-center" />
-              </Link>
-            </Show>
-          </div>
-        </div>
-      )}
     </nav>
   );
 }

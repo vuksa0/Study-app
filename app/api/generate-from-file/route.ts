@@ -1,7 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest, NextResponse } from "next/server";
 import mammoth from "mammoth";
-import { auth } from "@clerk/nextjs/server";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 import { getSupabaseAdmin } from "@/lib/supabase-server";
 
 export const maxDuration = 60;
@@ -43,12 +43,14 @@ function isPdfType(mime: string): boolean {
 }
 
 export async function POST(req: NextRequest) {
-  const { userId, sessionClaims } = await auth();
+  const { userId } = await auth();
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const plan = (sessionClaims?.publicMetadata as { plan?: string } | undefined)?.plan ?? "free";
+  const clerk = await clerkClient();
+  const user = await clerk.users.getUser(userId);
+  const plan = (user.publicMetadata as { plan?: string })?.plan ?? "free";
   const isPro = plan === "pro";
 
   if (!isPro) {

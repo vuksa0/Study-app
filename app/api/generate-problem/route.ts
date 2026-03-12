@@ -61,13 +61,12 @@ ${difficultyNote}
 
 Return ONLY valid JSON, no markdown fences, in this exact format:
 {
-  "problem": "Full problem statement with all necessary information. Use unicode math symbols (×, ÷, √, π, ², ³, ≤, ≥, ≠, ∞) where helpful. Be specific and unambiguous.",
-  "hint": "A helpful nudge that points toward the right approach without giving the answer away.",
-  "answer": "The concise correct answer (a number, formula, term, or short phrase).",
+  "problem": "Full problem statement. Wrap ALL math in LaTeX delimiters: $inline$ or $$block$$. Use \\frac{a}{b} for fractions, x^{2} for exponents, \\sqrt{x} for roots, \\cdot for multiply. Example: Find the value of $\\frac{3}{4} + \\frac{1}{2}$.",
+  "hint": "A helpful nudge. Wrap math in $...$.",
+  "answer": "Concise correct answer. Wrap math in $...$.",
   "steps": [
-    "Step 1: State what we know and what we need to find.",
+    "Step 1: State what we know. Wrap math in $...$.",
     "Step 2: ...",
-    "Step 3: ...",
     "Final answer: ..."
   ]
 }
@@ -75,6 +74,8 @@ Return ONLY valid JSON, no markdown fences, in this exact format:
 Rules:
 - steps must show the complete worked solution from beginning to end (3-6 steps)
 - problem must be self-contained — include all values, units, and context needed
+- ALWAYS use \\frac{}{} for fractions — NEVER write 1/5 as plain text
+- ALWAYS use x^{n} for exponents — NEVER write x**2 or x^2 without braces
 - answer should be the final result only, concise${urgency ? `\n\n${urgency}` : ""}`;
 
   try {

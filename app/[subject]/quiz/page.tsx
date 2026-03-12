@@ -7,6 +7,7 @@ import { getTestDate } from "@/lib/test-date";
 import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
 import { useState, useEffect, Suspense } from "react";
+import { useAuth } from "@clerk/nextjs";
 import { BottomNav } from "@/components/ui/bottom-nav";
 import { Spinner } from "@/components/ui/ios-spinner";
 
@@ -26,8 +27,30 @@ function QuizContent() {
   const subjectId = params.subject as string;
   const topicId = searchParams.get("topic") ?? undefined;
 
+  const { isSignedIn } = useAuth();
   const [subject, setSubject] = useState<Subject | null>(null);
   const [topic, setTopic] = useState<Topic | null>(null);
+  const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  async function saveQuiz() {
+    if (!isSignedIn || !subject || saving || saved) return;
+    setSaving(true);
+    try {
+      await fetch("/api/library", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "quiz",
+          subject_id: subjectId,
+          subject_name: subject.name,
+          title: `${subject.name}${topic ? ` · ${topic.name}` : ""} Quiz`,
+          data: { questions },
+        }),
+      });
+      setSaved(true);
+    } catch { /* silent */ } finally { setSaving(false); }
+  }
 
   useEffect(() => {
     const builtin = getSubject(subjectId);
@@ -428,17 +451,19 @@ function QuizContent() {
               >
                 {loading ? "Generating..." : "New Quiz"}
               </button>
+              <button
+                onClick={saveQuiz}
+                disabled={saving || saved}
+                className="w-full py-4 rounded-xl border border-white/15 text-white/60 font-bold hover:bg-white/5 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                <span className="material-symbols-outlined text-lg leading-none">{saved ? "bookmark_added" : "bookmark"}</span>
+                {saved ? "Saved to Library" : saving ? "Saving..." : "Save Quiz"}
+              </button>
               <Link
                 href={`/${subjectId}`}
-                className="w-full py-4 rounded-xl border border-white/15 text-white/60 font-bold hover:bg-white/5 transition-colors text-center"
-              >
-                Change Topic
-              </Link>
-              <Link
-                href="/library"
                 className="w-full py-4 rounded-xl border border-white/8 text-white/30 font-bold hover:text-white/60 transition-colors text-center"
               >
-                Back to Library
+                Change Topic
               </Link>
             </div>
           </>

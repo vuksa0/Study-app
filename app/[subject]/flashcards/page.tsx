@@ -7,6 +7,7 @@ import type { Subject, Topic } from "@/lib/subjects";
 import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
 import { useState, useEffect, Suspense } from "react";
+import { useAuth } from "@clerk/nextjs";
 import { BottomNav } from "@/components/ui/bottom-nav";
 
 interface Flashcard {
@@ -22,9 +23,31 @@ function FlashcardsContent() {
   const subjectId = params.subject as string;
   const topicId = searchParams.get("topic") ?? undefined;
 
+  const { isSignedIn } = useAuth();
   const [subject, setSubject] = useState<Subject | null>(null);
   const [topic, setTopic] = useState<Topic | null>(null);
   const [count, setCount] = useState(10);
+  const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  async function saveDeck() {
+    if (!isSignedIn || !subject || saving || saved) return;
+    setSaving(true);
+    try {
+      await fetch("/api/library", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "flashcards",
+          subject_id: subjectId,
+          subject_name: subject.name,
+          title: `${subject.name}${topic ? ` · ${topic.name}` : ""} Flashcards`,
+          data: { flashcards: cards },
+        }),
+      });
+      setSaved(true);
+    } catch { /* silent */ } finally { setSaving(false); }
+  }
   const [cards, setCards] = useState<Flashcard[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -223,7 +246,15 @@ function FlashcardsContent() {
               <button onClick={generateCards} disabled={loading} className="btn-primary w-full">
                 {loading ? "Generating..." : "New Deck"}
               </button>
-              <Link href={`/${subjectId}`} className="btn-secondary w-full">Back to Subject</Link>
+              <button
+                onClick={saveDeck}
+                disabled={saving || saved}
+                className="btn-secondary w-full flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                <span className="material-symbols-outlined text-lg leading-none">{saved ? "bookmark_added" : "bookmark"}</span>
+                {saved ? "Saved to Library" : saving ? "Saving..." : "Save Deck"}
+              </button>
+              <Link href={`/${subjectId}`} className="btn-secondary w-full text-center">Back to Subject</Link>
             </div>
           </div>
         )}
