@@ -11,6 +11,8 @@ import { SmartLink } from "@/components/SmartLink";
 import Link from "next/link";
 import MotionButton from "@/components/ui/motion-button";
 import { FaqSection } from "@/components/FaqSection";
+import { SubjectShaderCard } from "@/components/SubjectShaderCard";
+import { SUBJECT_ICON_MAP } from "@/components/SubjectIcons";
 
 export default function Home() {
   return (
@@ -234,17 +236,26 @@ export default function Home() {
             Pick a subject. Jump in.
           </h2>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-            {subjects.map((s) => (
-              <SmartLink key={s.id} href={`/subject/${s.id}`}>
-                <div className="group flex flex-col rounded-2xl border p-6 transition-all hover:shadow-md" style={{ background: `${s.iconColor}12`, borderColor: `${s.iconColor}30` }}>
-                  <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl" style={{ background: `${s.iconColor}25` }}>
-                    <span className="material-symbols-outlined text-2xl leading-none" style={{ color: s.iconColor }}>{s.icon}</span>
+            {subjects.map((s) => {
+              const def = SUBJECT_ICON_MAP[s.id];
+              return (
+                <SmartLink key={s.id} href={`/subject/${s.id}`}>
+                  <div className="group relative overflow-hidden rounded-2xl transition-all hover:shadow-lg" style={{ minHeight: 160 }}>
+                    <SubjectShaderCard subjectId={s.id} />
+                    <div className="relative z-10 flex flex-col p-5 h-full">
+                      {def && (
+                        <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl" style={{ background: "rgba(255,255,255,0.15)", color: "#fff" }}>
+                          <def.Icon className="h-5 w-5" />
+                        </div>
+                      )}
+                      <span className="mb-1 text-base font-bold text-white">{s.name}</span>
+                      <span className="text-xs text-white/60">{s.topics.length} topics</span>
+                      <span className="mt-auto pt-3 text-xs font-bold text-white/80 group-hover:text-white transition-colors">Start →</span>
+                    </div>
                   </div>
-                  <span className="mb-1 text-base font-bold text-[#111111] dark:text-white">{s.name}</span>
-                  <span className="text-xs text-[#94A3B8]">{s.topics.length} topics</span>
-                </div>
-              </SmartLink>
-            ))}
+                </SmartLink>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -468,30 +479,35 @@ export default function Home() {
                   <span className="text-sm font-bold text-[#111111] dark:text-white">Your Performance</span>
                   <span className="rounded-full bg-[#F0FDF4] dark:bg-[#052e16] px-3 py-1 text-xs font-semibold text-[#16A34A]">↑ Improving</span>
                 </div>
-                <div className="flex flex-col gap-4">
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                   {[
-                    { name: "Mathematics", score: 87, color: "#3B82F6" },
-                    { name: "Physics", score: 72, color: "#8B5CF6" },
-                    { name: "Chemistry", score: 65, color: "#10B981" },
-                    { name: "History", score: 91, color: "#F59E0B" },
-                    { name: "Biology", score: 58, color: "#059669" },
-                  ].map((s) => (
-                    <div key={s.name}>
-                      <div className="mb-1.5 flex items-center justify-between">
-                        <span className="text-xs font-medium text-[#64748B] dark:text-[#94A3B8]">{s.name}</span>
-                        <span className="text-xs font-bold" style={{ color: s.color }}>{s.score}%</span>
+                    { id: "mathematics", score: 87 },
+                    { id: "physics",     score: 72 },
+                    { id: "chemistry",   score: 65 },
+                    { id: "history",     score: 91 },
+                    { id: "biology",     score: 58 },
+                    { id: "english",     score: 80 },
+                  ].map((s) => {
+                    const def = SUBJECT_ICON_MAP[s.id];
+                    return (
+                      <div key={s.id} className="relative overflow-hidden rounded-xl" style={{ minHeight: 80 }}>
+                        <SubjectShaderCard subjectId={s.id} />
+                        <div className="relative z-10 flex flex-col justify-between p-3 h-full" style={{ minHeight: 80 }}>
+                          {def && <def.Icon className="h-4 w-4 text-white/80" />}
+                          <div className="mt-2">
+                            <div className="text-xs font-bold text-white capitalize">{s.id.replace("-", " ")}</div>
+                            <div className="text-[11px] font-black text-white/90">{s.score}%</div>
+                          </div>
+                        </div>
                       </div>
-                      <div className="h-2 w-full rounded-full bg-[#F1F5F9] dark:bg-[#2D3748]">
-                        <div className="h-2 rounded-full transition-all" style={{ width: `${s.score}%`, background: s.color }} />
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
                 <div className="mt-5 grid grid-cols-3 gap-3 border-t border-[#E2E8F0] dark:border-[#2D3748] pt-5">
                   {[
                     { label: "Quizzes taken", value: "142" },
-                    { label: "Avg. score", value: "74%" },
-                    { label: "Day streak", value: "12 🔥" },
+                    { label: "Avg. score",    value: "74%" },
+                    { label: "Day streak",    value: "12 🔥" },
                   ].map((stat) => (
                     <div key={stat.label} className="text-center">
                       <div className="text-lg font-black text-[#111111] dark:text-white">{stat.value}</div>
