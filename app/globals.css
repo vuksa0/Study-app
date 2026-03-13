@@ -93,6 +93,13 @@
 
 * { box-sizing: border-box; }
 
+button, a, [role="button"] {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button { cursor: pointer; }
+
 body {
   background: #ffffff;
   color: #111111;
@@ -183,6 +190,7 @@ body {
   cursor: pointer;
 }
 .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+.btn-primary:active { transform: scale(0.97); opacity: 1; }
 .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
 .btn-secondary {
