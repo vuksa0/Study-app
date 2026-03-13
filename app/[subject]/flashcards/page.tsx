@@ -9,6 +9,7 @@ import { useParams, useSearchParams } from "next/navigation";
 import { useState, useEffect, Suspense } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { ChevronLeft, Zap } from "lucide-react";
+import { useLocale } from "@/components/LocaleProvider";
 import { SUBJECT_ICON_MAP } from "@/components/SubjectIcons";
 import { BottomNav } from "@/components/ui/bottom-nav";
 
@@ -23,6 +24,7 @@ function FlashcardsContent() {
   const topicId = searchParams.get("topic") ?? undefined;
 
   const { isSignedIn } = useAuth();
+  const { t } = useLocale();
   const [subject, setSubject] = useState<Subject | null>(null);
   const [topic, setTopic] = useState<Topic | null>(null);
   const [count, setCount] = useState(10);
@@ -105,7 +107,7 @@ function FlashcardsContent() {
           className="inline-flex items-center gap-1.5 text-sm text-[#94A3B8] hover:text-[#64748B] dark:hover:text-white transition-colors mb-10"
         >
           <ChevronLeft className="h-4 w-4" />
-          {subject.name}
+          {t('back')} — {subject.name}
         </Link>
 
         {/* Setup */}
@@ -155,7 +157,7 @@ function FlashcardsContent() {
                   <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
                     <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeDasharray="40" strokeDashoffset="15"/>
                   </svg>
-                  Generating cards…
+                  {t('generating')}
                 </>
               ) : (
                 <>
@@ -171,7 +173,7 @@ function FlashcardsContent() {
         {started && !finished && card && (
           <div>
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-medium text-[#94A3B8]">{current + 1} / {cards.length}</span>
+              <span className="text-xs font-medium text-[#94A3B8]">{current + 1} {t('of')} {cards.length}</span>
               <span className="text-xs font-semibold text-green-600 dark:text-green-400">{known.size} known</span>
             </div>
             <div className="w-full h-1.5 rounded-full mb-8 overflow-hidden bg-[#F1F5F9] dark:bg-[#2D3748]">
@@ -186,7 +188,7 @@ function FlashcardsContent() {
               className="w-full rounded-2xl border border-[#E2E8F0] dark:border-[#2D3748] bg-white dark:bg-[#1A1A1A] p-8 text-center cursor-pointer transition-all mb-4 min-h-[200px] flex flex-col items-center justify-center gap-3 hover:shadow-md"
             >
               <span className="text-[10px] uppercase tracking-widest font-medium text-[#CBD5E1] dark:text-[#4A5568]">
-                {flipped ? "BACK — click to flip" : "FRONT — click to reveal"}
+                {flipped ? "BACK — click to flip" : t('tapToFlip')}
               </span>
               <p className="text-lg font-medium leading-relaxed text-[#111111] dark:text-white">
                 {flipped ? card.back : card.front}
@@ -196,10 +198,10 @@ function FlashcardsContent() {
             {flipped && (
               <div className="grid grid-cols-2 gap-2.5">
                 <button onClick={markStudying} className="py-3 rounded-xl border border-red-200 dark:border-red-800 text-red-500 dark:text-red-400 text-sm font-semibold hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
-                  Still Learning
+                  {t('stillLearning')}
                 </button>
                 <button onClick={markKnown} className="py-3 rounded-xl border border-green-200 dark:border-green-800 text-green-600 dark:text-green-400 text-sm font-semibold hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors">
-                  Got It ✓
+                  {t('knowIt')} ✓
                 </button>
               </div>
             )}
@@ -225,10 +227,10 @@ function FlashcardsContent() {
             </p>
             <div className="grid gap-2.5">
               <button onClick={generateCards} disabled={loading} className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#111111] dark:bg-white text-white dark:text-[#111111] py-3 text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-50">
-                {loading ? "Generating…" : "New Deck"}
+                {loading ? t('generating') : "New Deck"}
               </button>
               <button onClick={saveDeck} disabled={saving || saved} className="w-full flex items-center justify-center gap-2 rounded-xl border border-[#E2E8F0] dark:border-[#2D3748] text-[#64748B] dark:text-[#94A3B8] py-3 text-sm font-semibold hover:bg-[#F8FAFC] dark:hover:bg-[#222] transition-colors disabled:opacity-50">
-                {saved ? "Saved to Library ✓" : saving ? "Saving…" : "Save Deck"}
+                {saved ? "Saved to Library ✓" : saving ? t('saving') : "Save Deck"}
               </button>
               <Link href={`/subject/${subjectId}`} className="w-full rounded-xl border border-[#E2E8F0] dark:border-[#2D3748] text-[#64748B] dark:text-[#94A3B8] py-3 text-sm font-semibold text-center hover:bg-[#F8FAFC] dark:hover:bg-[#222] transition-colors block">
                 Back to Subject

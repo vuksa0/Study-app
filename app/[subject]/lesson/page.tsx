@@ -9,6 +9,7 @@ import { useParams, useSearchParams } from "next/navigation";
 import { useState, useEffect, Suspense } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { BottomNav } from "@/components/ui/bottom-nav";
+import { useLocale } from "@/components/LocaleProvider";
 
 interface Lesson {
   title: string;
@@ -25,6 +26,7 @@ function LessonContent() {
   const topicId = searchParams.get("topic") ?? undefined;
 
   const { isSignedIn } = useAuth();
+  const { t } = useLocale();
   const [subject, setSubject] = useState<Subject | null>(null);
   const [topic, setTopic] = useState<Topic | null>(null);
   const [lesson, setLesson] = useState<Lesson | null>(null);

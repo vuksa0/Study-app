@@ -10,6 +10,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { BottomNav } from "@/components/ui/bottom-nav";
 import { Spinner } from "@/components/ui/ios-spinner";
+import { useLocale } from "@/components/LocaleProvider";
 
 interface Question {
   question: string;
@@ -28,6 +29,7 @@ function QuizContent() {
   const topicId = searchParams.get("topic") ?? undefined;
 
   const { isSignedIn } = useAuth();
+  const { t } = useLocale();
   const [subject, setSubject] = useState<Subject | null>(null);
   const [topic, setTopic] = useState<Topic | null>(null);
   const [saved, setSaved] = useState(false);
@@ -208,7 +210,7 @@ function QuizContent() {
                 {loading ? (
                   <>
                     <Spinner size="sm" className="text-[#111111]" />
-                    Generating...
+                    {t('generating')}
                   </>
                 ) : (
                   <>
@@ -372,7 +374,7 @@ function QuizContent() {
                   onClick={next}
                   className="w-full py-5 rounded-xl bg-white text-[#111111] font-bold text-lg hover:opacity-90 transition-all flex items-center justify-center gap-2"
                 >
-                  {current + 1 >= questions.length ? "See Results" : "Next Question"}
+                  {current + 1 >= questions.length ? t('seeResults') : t('nextQuestion')}
                   <span className="material-symbols-outlined leading-none">arrow_forward</span>
                 </button>
               )}
@@ -410,7 +412,7 @@ function QuizContent() {
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                   <span className="text-4xl font-bold">{percentage}%</span>
-                  <span className="text-sm font-medium text-white/50">Score</span>
+                  <span className="text-sm font-medium text-white/50">{t('score')}</span>
                 </div>
               </div>
               <div className="mt-6 text-center">
@@ -428,12 +430,12 @@ function QuizContent() {
               <div className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col items-center">
                 <span className="material-symbols-outlined text-green-500 mb-1">check_circle</span>
                 <span className="text-xl font-bold">{score}</span>
-                <span className="text-[10px] uppercase tracking-wider text-white/40">Correct</span>
+                <span className="text-[10px] uppercase tracking-wider text-white/40">{t('correct')}</span>
               </div>
               <div className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col items-center">
                 <span className="material-symbols-outlined text-red-500 mb-1">cancel</span>
                 <span className="text-xl font-bold">{questions.length - score}</span>
-                <span className="text-[10px] uppercase tracking-wider text-white/40">Incorrect</span>
+                <span className="text-[10px] uppercase tracking-wider text-white/40">{t('incorrect')}</span>
               </div>
               <div className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col items-center">
                 <span className="material-symbols-outlined text-orange-500 mb-1">local_fire_department</span>
@@ -449,7 +451,7 @@ function QuizContent() {
                 disabled={loading}
                 className="w-full py-4 rounded-xl bg-white text-[#111111] font-bold hover:opacity-90 transition-all disabled:opacity-40"
               >
-                {loading ? "Generating..." : "New Quiz"}
+                {loading ? t('generating') : "New Quiz"}
               </button>
               <button
                 onClick={saveQuiz}
@@ -457,7 +459,7 @@ function QuizContent() {
                 className="w-full py-4 rounded-xl border border-white/15 text-white/60 font-bold hover:bg-white/5 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 <span className="material-symbols-outlined text-lg leading-none">{saved ? "bookmark_added" : "bookmark"}</span>
-                {saved ? "Saved to Library" : saving ? "Saving..." : "Save Quiz"}
+                {saved ? "Saved to Library" : saving ? t('saving') : "Save Quiz"}
               </button>
               <Link
                 href={`/${subjectId}`}

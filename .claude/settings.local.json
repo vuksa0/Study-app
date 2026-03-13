@@ -6,7 +6,20 @@
       "Bash(npm run build)",
       "Bash(ls -la c:/Users/vukzi/kviz-app/*.ts c:/Users/vukzi/kviz-app/*.tsx)",
       "Bash(git add -A)",
-      "Bash(git commit -m \"Add Warp shader background to all subject cards\")"
+      "Bash(git commit -m \"Add Warp shader background to all subject cards\")",
+      "Bash(node -e \"const fs=require\\(''fs''\\); const c=fs.readFileSync\\(''components/Navigation.tsx'',''utf8''\\); console.log\\(c.slice\\(0,50\\)\\);\")",
+      "Bash(git add app/[subject]/flashcards/page.tsx app/api/generate-flashcards/route.ts app/api/generate-lesson/route.ts app/api/generate-problem/route.ts app/api/generate-quiz/route.ts app/api/generate-roadmap/route.ts app/layout.tsx app/roadmap/page.tsx app/subscription/page.tsx components/Navigation.tsx package-lock.json package.json proxy.ts app/api/stripe/ app/pricing/ components/LocaleProvider.tsx lib/i18n.ts lib/stripe.ts)",
+      "Bash(git commit:*)",
+      "Bash(git push origin main)",
+      "Bash(vercel env ls)",
+      "Bash(vercel env add STRIPE_SECRET_KEY production --force)",
+      "Bash(vercel env add STRIPE_WEBHOOK_SECRET production --force)",
+      "Bash(vercel env add STRIPE_PLUS_PRICE_ID production --force)",
+      "Bash(vercel env add STRIPE_PRO_PRICE_ID production --force)",
+      "Bash(vercel --prod)",
+      "Bash(stripe --version)",
+      "Bash(stripe config:*)",
+      "Bash(vercel env:*)"
     ]
   }
 }
