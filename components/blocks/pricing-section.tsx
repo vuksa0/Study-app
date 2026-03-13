@@ -82,7 +82,7 @@ export function PricingSection() {
       router.push("/login")
       return
     }
-    router.push("/checkout")
+    router.push(`/checkout?plan=${tier.plan}`)
   }
 
   return (
