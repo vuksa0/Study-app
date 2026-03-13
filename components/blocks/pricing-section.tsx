@@ -238,7 +238,7 @@ export function PricingSection() {
                 )}
               >
                 <span className="flex items-center gap-2">
-                  {loadingPlan === tier.plan ? "Redirecting…" : tier.cta}
+                  {loadingPlan !== null && loadingPlan === tier.plan ? "Redirecting…" : tier.cta}
                   {loadingPlan !== tier.plan && (
                     <ArrowRightIcon className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
                   )}
