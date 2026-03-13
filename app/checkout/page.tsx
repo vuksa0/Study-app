@@ -11,8 +11,8 @@ const PLANS = [
   {
     id: "plus",
     name: "Plus",
-    price: 9,
-    priceYearly: 86,
+    price: "9.99",
+    priceYearly: "95.90",
     description: "For serious students",
     icon: Zap,
     color: "bg-[#111111] dark:bg-white",
@@ -31,8 +31,8 @@ const PLANS = [
   {
     id: "pro",
     name: "Pro",
-    price: 25,
-    priceYearly: 240,
+    price: "24.99",
+    priceYearly: "239.90",
     description: "For power users",
     icon: Shield,
     color: "bg-[#F8FAFC] dark:bg-[#1A1A1A]",

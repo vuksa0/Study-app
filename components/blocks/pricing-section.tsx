@@ -15,7 +15,7 @@ interface Feature {
 interface PricingTier {
   name: string
   plan: string | null
-  price: { monthly: number; yearly: number }
+  price: { monthly: string; yearly: string }
   description: string
   features: Feature[]
   highlight?: boolean
@@ -27,7 +27,7 @@ const tiers: PricingTier[] = [
   {
     name: "Free",
     plan: null,
-    price: { monthly: 0, yearly: 0 },
+    price: { monthly: "0", yearly: "0" },
     description: "Perfect for getting started",
     cta: "Get started",
     features: [
@@ -43,7 +43,7 @@ const tiers: PricingTier[] = [
   {
     name: "Plus",
     plan: "plus",
-    price: { monthly: 9, yearly: 86 },
+    price: { monthly: "9.99", yearly: "95.90" },
     description: "For serious students",
     highlight: true,
     badge: "Most Popular",
@@ -61,7 +61,7 @@ const tiers: PricingTier[] = [
   {
     name: "Pro",
     plan: "pro",
-    price: { monthly: 25, yearly: 240 },
+    price: { monthly: "24.99", yearly: "239.90" },
     description: "For power users",
     cta: "Get started",
     features: [
