@@ -13,4 +13,10 @@ export const PLANS = {
     price: 9.99,
     currency: "USD",
   },
+  pro: {
+    name: "Pro",
+    priceId: process.env.STRIPE_PRO_PRICE_ID!,
+    price: 24.99,
+    currency: "USD",
+  },
 } as const;
