@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { detectBrowserLanguage, isNorwegian, type LangCode } from "@/lib/i18n";
 import { t as tFn, type Translations } from "@/lib/translations";
 
@@ -28,19 +28,23 @@ export function LocaleProvider({ children }: { children: React.ReactNode }) {
     setLanguageState(saved ?? detectBrowserLanguage());
   }, []);
 
-  function setLanguage(l: LangCode) {
+  const setLanguage = useCallback((l: LangCode) => {
     setLanguageState(l);
     localStorage.setItem("thinkio_lang", l);
-  }
+  }, []);
 
   const currency: "USD" | "NOK" = isNorwegian(language) ? "NOK" : "USD";
 
-  function formatPrice(usd: number, nok: number) {
-    if (currency === "NOK") return `${nok} kr`;
+  const formatPrice = useCallback((usd: number, nok: number) => {
+    if (isNorwegian(language)) return `${nok} kr`;
     return `$${usd}`;
-  }
+  }, [language]);
 
-  return <Ctx.Provider value={{ language, setLanguage, currency, formatPrice, t: (key) => tFn(language, key) }}>{children}</Ctx.Provider>;
+  const t = useCallback((key: keyof Translations) => tFn(language, key), [language]);
+
+  const value = useMemo(() => ({ language, setLanguage, currency, formatPrice, t }), [language, setLanguage, currency, formatPrice, t]);
+
+  return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 
 export function useLocale() {
