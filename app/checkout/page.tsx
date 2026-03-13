@@ -74,10 +74,10 @@ function CheckoutContent() {
         if (data.url) {
           window.location.href = data.url;
         } else {
-          setError("Could not start checkout. Please try again.");
+          setError(data.error ?? "Could not start checkout. Please try again.");
         }
-      } catch {
-        setError("Something went wrong. Please try again.");
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
       }
     }
 
