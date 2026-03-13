@@ -200,7 +200,7 @@ export function Navigation() {
           )}
           <Show when="signed-out">
             <Link href="/login" className="hidden text-sm text-[#111111] dark:text-white hover:text-[#64748B] dark:hover:text-[#94A3B8] transition-colors md:block">Log in</Link>
-            <Link href="/login" className="hidden md:block">
+            <Link href="/pricing" className="hidden md:block">
               <InteractiveHoverButton text="Get started" className="h-9 py-0" />
             </Link>
             <Link href="/login" className="text-sm font-semibold text-[#111111] dark:text-white md:hidden">Log in</Link>

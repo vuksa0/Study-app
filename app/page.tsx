@@ -58,7 +58,7 @@ export default function Home() {
 
 
           <div className="flex flex-col items-center justify-center gap-4 md:flex-row">
-            <Link href="/subjects">
+            <Link href="/pricing">
               <MotionButton label="Get started" />
             </Link>
             <Link href="/upload">
@@ -564,7 +564,7 @@ export default function Home() {
               Ready to study smarter?
             </h2>
             <div className="mb-6 flex flex-col items-center justify-center gap-4 md:flex-row">
-              <Link href="/subjects">
+              <Link href="/pricing">
                 <MotionButton label="Get started" />
               </Link>
               <Link href="/subjects">
