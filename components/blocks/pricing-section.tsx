@@ -2,10 +2,8 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { useAuth } from "@clerk/nextjs"
 import { CheckIcon, ArrowRightIcon } from "@radix-ui/react-icons"
 import { cn } from "@/lib/utils"
-import Link from "next/link"
 
 interface Feature {
   name: string
@@ -77,33 +75,14 @@ const tiers: PricingTier[] = [
 
 export function PricingSection() {
   const [isYearly, setIsYearly] = useState(false)
-  const [loadingPlan, setLoadingPlan] = useState<string | null>(null)
-  const { isSignedIn } = useAuth()
   const router = useRouter()
 
-  async function handleCta(tier: PricingTier) {
+  function handleCta(tier: PricingTier) {
     if (!tier.plan) {
       router.push("/login")
       return
     }
-    if (!isSignedIn) {
-      router.push("/login")
-      return
-    }
-    setLoadingPlan(tier.plan)
-    try {
-      const res = await fetch("/api/stripe/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan: tier.plan }),
-      })
-      const data = await res.json()
-      if (data.url) window.location.href = data.url
-    } catch {
-      // ignore
-    } finally {
-      setLoadingPlan(null)
-    }
+    router.push("/checkout")
   }
 
   return (
@@ -229,19 +208,16 @@ export function PricingSection() {
               {/* CTA */}
               <button
                 onClick={() => handleCta(tier)}
-                disabled={loadingPlan === tier.plan && tier.plan !== null}
                 className={cn(
-                  "group relative flex h-12 w-full items-center justify-center overflow-hidden rounded-full text-sm font-bold transition-all duration-200 disabled:opacity-50",
+                  "group relative flex h-12 w-full items-center justify-center overflow-hidden rounded-full text-sm font-bold transition-all duration-200",
                   tier.highlight
                     ? "bg-white dark:bg-[#111111] text-[#111111] dark:text-white hover:opacity-90"
                     : "border border-[#111111] dark:border-white bg-transparent text-[#111111] dark:text-white hover:bg-[#111111] dark:hover:bg-white hover:text-white dark:hover:text-[#111111]",
                 )}
               >
                 <span className="flex items-center gap-2">
-                  {loadingPlan !== null && loadingPlan === tier.plan ? "Redirecting…" : tier.cta}
-                  {loadingPlan !== tier.plan && (
-                    <ArrowRightIcon className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
-                  )}
+                  {tier.cta}
+                  <ArrowRightIcon className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
                 </span>
               </button>
             </div>
