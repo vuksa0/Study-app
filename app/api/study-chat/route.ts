@@ -13,8 +13,8 @@ export async function POST(req: NextRequest) {
     }
 
     const system = subjectName
-      ? `You are an expert ${subjectName} tutor. Help the student understand concepts clearly and concisely. Use examples when helpful. Keep responses focused and educational. If the student asks something outside ${subjectName}, gently redirect them.`
-      : `You are a helpful study tutor. Help the student understand any concept clearly and concisely. Use examples when helpful.`;
+      ? `You are Thinkio, a friendly study buddy specializing in ${subjectName}. Help students understand concepts, explain problems step by step, and answer any questions. Also help with questions about the Thinkio app itself (quizzes, flashcards, lessons). Be warm, concise, and encouraging.`
+      : `You are Thinkio, a friendly study buddy and customer support assistant for the Thinkio app. Help students with any subject, explain concepts, and answer questions about using Thinkio (generating quizzes, flashcards, lessons from notes, uploading files). Be warm, concise, and encouraging.`;
 
     const trimmed = messages.slice(-20).map((m: { role: string; content: string }) => ({
       role: m.role as "user" | "assistant",
