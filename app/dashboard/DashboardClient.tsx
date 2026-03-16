@@ -41,7 +41,7 @@ const SUBJECT_ITEMS = [
 ];
 
 const RECOMMENDED_QUIZZES = [
-  { icon: <Sigma className="h-6 w-6" />, iconBg: "rgba(59,130,246,0.12)", iconColor: "#3B82F6", title: "Calculus Foundations", meta: "15m · Hard", href: "/mathematics/quiz" },
+  { icon: <Sigma className="h-6 w-6" />, iconBg: "rgba(59,130,246,0.12)", iconColor: "#3B82F6", title: "Calculus Foundations", meta: "15m · Hard", href: "/mathematics/problems" },
   { icon: <FlaskConical className="h-6 w-6" />, iconBg: "rgba(16,185,129,0.12)", iconColor: "#10B981", title: "Chemical Reactions", meta: "10m · Medium", href: "/chemistry/quiz" },
   { icon: <Code2 className="h-6 w-6" />, iconBg: "rgba(249,115,22,0.12)", iconColor: "#F97316", title: "Algorithms & Data Structures", meta: "20m · Expert", href: "/computer-science/quiz" },
 ];

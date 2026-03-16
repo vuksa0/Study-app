@@ -130,10 +130,12 @@ const MATH_KEYS: { label: string; value: string }[] = [
   { label: "Δ", value: "Δ" }, { label: "∛", value: "∛" }, { label: "/", value: "/" },
 ];
 
-const MODE_CONFIG: { id: Mode; label: string; icon: React.ReactNode; subjects?: string[] }[] = [
-  { id: "quiz",       label: "Quiz",        icon: <Zap className="h-4 w-4" /> },
-  { id: "flashcards", label: "Flashcards",  icon: <FileText className="h-4 w-4" /> },
-  { id: "lesson",     label: "Lesson",      icon: <BookOpen className="h-4 w-4" /> },
+const PROBLEMS_ONLY_SUBJECTS = ["mathematics", "physics"];
+
+const MODE_CONFIG: { id: Mode; label: string; icon: React.ReactNode; subjects?: string[]; exclude?: string[] }[] = [
+  { id: "quiz",       label: "Quiz",        icon: <Zap className="h-4 w-4" />,        exclude: PROBLEMS_ONLY_SUBJECTS },
+  { id: "flashcards", label: "Flashcards",  icon: <FileText className="h-4 w-4" />,   exclude: PROBLEMS_ONLY_SUBJECTS },
+  { id: "lesson",     label: "Lesson",      icon: <BookOpen className="h-4 w-4" />,   exclude: PROBLEMS_ONLY_SUBJECTS },
   { id: "problems",   label: "Problems",    icon: <Calculator className="h-4 w-4" />, subjects: ["mathematics","chemistry","physics","biology","computer-science"] },
 ];
 
@@ -518,9 +520,11 @@ function UploadContent() {
     setError("");
   }
 
-  const availableModes = MODE_CONFIG.filter((m) =>
-    !m.subjects || (subject && m.subjects.includes(subject.id))
-  );
+  const availableModes = MODE_CONFIG.filter((m) => {
+    if (m.exclude && subject && m.exclude.includes(subject.id)) return false;
+    if (m.subjects && (!subject || !m.subjects.includes(subject.id))) return false;
+    return true;
+  });
 
   // ── Pick subject screen ──────────────────────────────────────────────────
   if (step === "pick-subject") return (

@@ -5,8 +5,10 @@ import { getCustomSubjects } from "@/lib/custom-subjects";
 import type { Subject, Topic } from "@/lib/subjects";
 import { getTestDate } from "@/lib/test-date";
 import Link from "next/link";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams, useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect, Suspense } from "react";
+
+const PROBLEMS_ONLY = ["mathematics", "physics"];
 import { useAuth } from "@clerk/nextjs";
 import { BottomNav } from "@/components/ui/bottom-nav";
 import { Spinner } from "@/components/ui/ios-spinner";
@@ -25,8 +27,15 @@ const OPTION_LABELS = ["A", "B", "C", "D"];
 function QuizContent() {
   const params = useParams();
   const searchParams = useSearchParams();
+  const router = useRouter();
   const subjectId = params.subject as string;
   const topicId = searchParams.get("topic") ?? undefined;
+
+  useEffect(() => {
+    if (PROBLEMS_ONLY.includes(subjectId)) {
+      router.replace(`/${subjectId}/problems`);
+    }
+  }, [subjectId, router]);
 
   const { isSignedIn } = useAuth();
   const { t } = useLocale();

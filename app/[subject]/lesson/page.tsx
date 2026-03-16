@@ -5,8 +5,10 @@ import { getCustomSubjects } from "@/lib/custom-subjects";
 import { getTestDate } from "@/lib/test-date";
 import type { Subject, Topic } from "@/lib/subjects";
 import Link from "next/link";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams, useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect, Suspense } from "react";
+
+const PROBLEMS_ONLY = ["mathematics", "physics"];
 import { useAuth } from "@clerk/nextjs";
 import { BottomNav } from "@/components/ui/bottom-nav";
 import { useLocale } from "@/components/LocaleProvider";
@@ -22,8 +24,15 @@ interface Lesson {
 function LessonContent() {
   const params = useParams();
   const searchParams = useSearchParams();
+  const router = useRouter();
   const subjectId = params.subject as string;
   const topicId = searchParams.get("topic") ?? undefined;
+
+  useEffect(() => {
+    if (PROBLEMS_ONLY.includes(subjectId)) {
+      router.replace(`/${subjectId}/problems`);
+    }
+  }, [subjectId, router]);
 
   const { isSignedIn } = useAuth();
   const { t } = useLocale();
