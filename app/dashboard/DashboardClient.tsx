@@ -4,9 +4,9 @@ import { useState } from "react";
 import Link from "next/link";
 import {
   LayoutDashboard, BookOpen, Brain, TrendingUp, Settings,
-  Zap, Play, Bookmark, RefreshCw, Trophy,
+  Zap, Play, Trophy,
   Timer, BarChart2, ChevronRight, Code2, FlaskConical, Sigma, ExternalLink,
-  Plus, Bell, HelpCircle, Share2,
+  Plus, Bell, HelpCircle, Share2, ArrowRight,
 } from "lucide-react";
 import { ThinkioLogo } from "@/components/ThinkioLogo";
 import { UserButton } from "@clerk/nextjs";
@@ -30,23 +30,40 @@ interface Props {
 }
 
 const SUBJECT_ITEMS = [
-  { id: "mathematics",      name: "Mathematics",      courses: 7 },
-  { id: "physics",          name: "Physics",          courses: 6 },
-  { id: "chemistry",        name: "Chemistry",        courses: 6 },
-  { id: "history",          name: "History",          courses: 6 },
-  { id: "biology",          name: "Biology",          courses: 6 },
-  { id: "geography",        name: "Geography",        courses: 5 },
-  { id: "english",          name: "English",          courses: 6 },
-  { id: "computer-science", name: "Computer Science", courses: 7 },
+  { id: "mathematics",      name: "Mathematics",      topics: 5 },
+  { id: "physics",          name: "Physics",          topics: 5 },
+  { id: "chemistry",        name: "Chemistry",        topics: 5 },
+  { id: "history",          name: "History",          topics: 5 },
+  { id: "biology",          name: "Biology",          topics: 5 },
+  { id: "geography",        name: "Geography",        topics: 4 },
+  { id: "english",          name: "English",          topics: 4 },
+  { id: "computer-science", name: "Computer Science", topics: 4 },
 ];
 
 const RECOMMENDED_QUIZZES = [
-  { icon: <Sigma className="h-6 w-6" />, iconBg: "rgba(59,130,246,0.12)", iconColor: "#3B82F6", title: "Calculus Foundations", meta: "15m · Hard", desc: "Master derivatives and integration rules with our adaptive assessment engine.", href: "/mathematics/quiz" },
-  { icon: <FlaskConical className="h-6 w-6" />, iconBg: "rgba(16,185,129,0.12)", iconColor: "#10B981", title: "Chemical Reactions", meta: "10m · Medium", desc: "Test your knowledge of reaction types, balancing equations and reaction rates.", href: "/chemistry/quiz" },
-  { icon: <Code2 className="h-6 w-6" />, iconBg: "rgba(249,115,22,0.12)", iconColor: "#F97316", title: "Algorithms & Data Structures", meta: "20m · Expert", desc: "Test sorting algorithms, Big-O notation, trees, graphs and dynamic programming.", href: "/computer-science/quiz" },
+  { icon: <Sigma className="h-6 w-6" />, iconBg: "rgba(59,130,246,0.12)", iconColor: "#3B82F6", title: "Calculus Foundations", meta: "15m · Hard", href: "/mathematics/quiz" },
+  { icon: <FlaskConical className="h-6 w-6" />, iconBg: "rgba(16,185,129,0.12)", iconColor: "#10B981", title: "Chemical Reactions", meta: "10m · Medium", href: "/chemistry/quiz" },
+  { icon: <Code2 className="h-6 w-6" />, iconBg: "rgba(249,115,22,0.12)", iconColor: "#F97316", title: "Algorithms & Data Structures", meta: "20m · Expert", href: "/computer-science/quiz" },
 ];
 
 const DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+function lerpColor(a: [number, number, number], b: [number, number, number], t: number): string {
+  const r = Math.round(a[0] + (b[0] - a[0]) * t);
+  const g = Math.round(a[1] + (b[1] - a[1]) * t);
+  const bl = Math.round(a[2] + (b[2] - a[2]) * t);
+  return `rgb(${r},${g},${bl})`;
+}
+
+const RED:    [number,number,number] = [239, 68,  68];   // #EF4444
+const ORANGE: [number,number,number] = [249, 115, 22];   // #F97316
+const GREEN:  [number,number,number] = [16,  185, 129];  // #10B981
+
+function progressColor(pct: number): string {
+  if (pct <= 40)  return lerpColor(RED, ORANGE, pct / 40);
+  if (pct <= 75)  return lerpColor(ORANGE, GREEN, (pct - 40) / 35);
+  return lerpColor(GREEN, GREEN, 1);
+}
 
 const NAV_ITEMS: { id: Tab; label: string; icon: React.ReactNode }[] = [
   { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard className="h-4 w-4" /> },
@@ -59,14 +76,37 @@ const NAV_ITEMS: { id: Tab; label: string; icon: React.ReactNode }[] = [
 const WHATS_NEW = [
   "AI Lesson Generator",
   "Smart Flashcards",
-  "Progress Tracking",
 ];
+
+function SubjectCard({ s, href }: { s: typeof SUBJECT_ITEMS[number]; href: string }) {
+  const def = SUBJECT_ICON_MAP[s.id];
+  return (
+    <Link href={href}>
+      <div className="group relative flex flex-col overflow-hidden rounded-2xl cursor-pointer transition-transform hover:-translate-y-0.5 hover:shadow-xl">
+        <SubjectShaderCard subjectId={s.id} />
+        <div className="relative z-10 flex flex-col p-5 h-full min-h-[170px] justify-between">
+          <div>
+            {def && (
+              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl" style={{ background: "rgba(255,255,255,0.15)", color: "#fff" }}>
+                <def.Icon className="h-5 w-5" />
+              </div>
+            )}
+            <h3 className="text-[15px] font-bold text-white leading-tight">{s.name}</h3>
+            <p className="text-xs text-white/60 mt-0.5">{s.topics} topics</p>
+          </div>
+          <span className="text-sm font-semibold text-white/80 group-hover:text-white transition-colors flex items-center gap-1">
+            Start <ArrowRight className="h-3.5 w-3.5" />
+          </span>
+        </div>
+      </div>
+    </Link>
+  );
+}
 
 export function DashboardClient({ firstName, totalCompleted, streak, weekly, weeklyCompleted, weeklyPct, lastLesson }: Props) {
   const [tab, setTab] = useState<Tab>("dashboard");
   const maxActivity = Math.max(...weekly, 1);
 
-  // Build a simple donut for weekly goal
   const radius = 40;
   const circ = 2 * Math.PI * radius;
   const filled = (weeklyPct / 100) * circ;
@@ -76,12 +116,10 @@ export function DashboardClient({ firstName, totalCompleted, streak, weekly, wee
 
       {/* ── Sidebar ── */}
       <aside className="w-56 flex-shrink-0 bg-white dark:bg-[#111111] border-r border-gray-200 dark:border-[#1E293B] flex flex-col sticky top-0 h-screen overflow-y-auto">
-        {/* Logo */}
         <div className="px-5 py-4 border-b border-gray-100 dark:border-[#1E293B]">
           <Link href="/"><ThinkioLogo /></Link>
         </div>
 
-        {/* Nav */}
         <nav className="flex-1 px-3 py-3 space-y-0.5">
           {NAV_ITEMS.map((item) => (
             <button
@@ -89,7 +127,7 @@ export function DashboardClient({ firstName, totalCompleted, streak, weekly, wee
               onClick={() => setTab(item.id)}
               className={`flex items-center gap-2.5 w-full px-3 py-2 rounded-lg text-[13px] font-medium transition-colors text-left ${
                 tab === item.id
-                  ? "bg-violet-600 text-white"
+                  ? "bg-[#111111] dark:bg-white text-white dark:text-[#111111]"
                   : "text-gray-600 dark:text-[#94A3B8] hover:bg-gray-100 dark:hover:bg-[#1A1A2E]"
               }`}
             >
@@ -102,13 +140,13 @@ export function DashboardClient({ firstName, totalCompleted, streak, weekly, wee
         {/* What's New */}
         <div className="mx-3 mb-3 rounded-xl border border-gray-200 dark:border-[#1E293B] overflow-hidden">
           <div className="px-3 py-2.5 bg-gray-50 dark:bg-[#1A1A2E] flex items-center gap-1.5">
-            <Zap className="h-3 w-3 text-violet-500" />
+            <Zap className="h-3 w-3 text-gray-400 dark:text-[#64748B]" />
             <span className="text-[11px] font-bold text-gray-500 dark:text-[#64748B] uppercase tracking-widest">What&apos;s New</span>
           </div>
           {WHATS_NEW.map((item, i) => (
             <div key={item} className={`flex items-center justify-between px-3 py-2 dark:bg-[#111111] ${i < WHATS_NEW.length - 1 ? "border-b border-gray-100 dark:border-[#1E293B]" : ""}`}>
               <span className="text-[12px] text-gray-700 dark:text-[#CBD5E1]">{item}</span>
-              <Plus className="h-3.5 w-3.5 text-violet-400 shrink-0" />
+              <Plus className="h-3.5 w-3.5 text-gray-400 shrink-0" />
             </div>
           ))}
         </div>
@@ -131,17 +169,17 @@ export function DashboardClient({ firstName, totalCompleted, streak, weekly, wee
                   <button className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-[#1A1A2E] text-gray-400"><Share2 className="h-4 w-4" /></button>
                   <button className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-[#1A1A2E] text-gray-400"><Bell className="h-4 w-4" /></button>
                   <button className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-[#1A1A2E] text-gray-400"><HelpCircle className="h-4 w-4" /></button>
-                  <Link href="/subscription" className="ml-1 px-3 py-1.5 bg-violet-600 text-white text-xs font-semibold rounded-lg hover:bg-violet-700 transition-colors">Upgrade</Link>
+                  <Link href="/subscription" className="ml-1 px-3 py-1.5 bg-[#111111] dark:bg-white text-white dark:text-[#111111] text-xs font-semibold rounded-full hover:opacity-80 transition-opacity">Upgrade</Link>
                 </div>
               </div>
 
               {/* Banner */}
-              <div className="flex items-center justify-between bg-violet-50 dark:bg-violet-950/30 border border-violet-100 dark:border-violet-900/40 rounded-xl px-4 py-3">
+              <div className="flex items-center justify-between bg-gray-900 dark:bg-[#1A1A2E] border border-gray-800 dark:border-[#1E293B] rounded-xl px-4 py-3">
                 <div className="flex items-center gap-2.5">
-                  <div className="h-7 w-7 rounded-full bg-violet-100 dark:bg-violet-900/40 flex items-center justify-center shrink-0">
-                    <Zap className="h-3.5 w-3.5 text-violet-600" />
+                  <div className="h-7 w-7 rounded-full bg-white/10 flex items-center justify-center shrink-0">
+                    <Zap className="h-3.5 w-3.5 text-white" />
                   </div>
-                  <span className="text-sm text-violet-800 dark:text-violet-300">
+                  <span className="text-sm text-white/80">
                     {weeklyPct >= 100 ? "You've crushed your weekly goals!" : weeklyPct > 0 ? `You've completed ${weeklyPct}% of your weekly goal.` : "Start studying to hit your weekly goals."}
                   </span>
                 </div>
@@ -151,7 +189,7 @@ export function DashboardClient({ firstName, totalCompleted, streak, weekly, wee
               {/* 3-column layout */}
               <div className="grid grid-cols-12 gap-4">
 
-                {/* Left: stacked stat cards */}
+                {/* Left: stat cards */}
                 <div className="col-span-12 md:col-span-3 bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#1E293B] rounded-xl overflow-hidden">
                   {[
                     { label: "Lessons completed", value: totalCompleted },
@@ -170,7 +208,7 @@ export function DashboardClient({ firstName, totalCompleted, streak, weekly, wee
                   ))}
                 </div>
 
-                {/* Center: progress visual + continue learning */}
+                {/* Center: progress + continue learning */}
                 <div className="col-span-12 md:col-span-5 space-y-4">
                   {/* Weekly progress card */}
                   <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#1E293B] rounded-xl p-5">
@@ -182,15 +220,14 @@ export function DashboardClient({ firstName, totalCompleted, streak, weekly, wee
                       <span className="text-xs text-gray-400 dark:text-[#64748B] bg-gray-100 dark:bg-[#1E293B] px-2 py-1 rounded-lg">Last 7 days</span>
                     </div>
 
-                    {/* Donut + bar chart side by side */}
                     <div className="flex items-center gap-6">
                       {/* Donut */}
                       <div className="relative flex-shrink-0">
-                        <svg width="100" height="100" viewBox="0 0 100 100" className="[&>circle:first-child]:dark:stroke-[#1E293B]">
-                          <circle cx="50" cy="50" r={radius} fill="none" stroke="#F3F4F6" strokeWidth="12" />
+                        <svg width="100" height="100" viewBox="0 0 100 100">
+                          <circle cx="50" cy="50" r={radius} fill="none" stroke="#F3F4F6" strokeWidth="12" className="dark:stroke-[#1E293B]" />
                           <circle
                             cx="50" cy="50" r={radius}
-                            fill="none" stroke="#7C3AED" strokeWidth="12"
+                            fill="none" stroke={progressColor(weeklyPct)} strokeWidth="12"
                             strokeDasharray={`${filled} ${circ - filled}`}
                             strokeDashoffset={circ / 4}
                             strokeLinecap="round"
@@ -205,18 +242,22 @@ export function DashboardClient({ firstName, totalCompleted, streak, weekly, wee
                       {/* Bar chart */}
                       <div className="flex-1">
                         <div className="flex items-end gap-1 h-16">
-                          {weekly.map((count, i) => (
-                            <div key={i} className="flex-1 flex flex-col items-center gap-0.5">
-                              <div
-                                className="w-full rounded-t-sm transition-colors"
-                                style={{
-                                  height: `${Math.max(4, Math.round((count / maxActivity) * 100))}%`,
-                                  minHeight: 4,
-                                  background: count > 0 ? "#7C3AED" : "#E5E7EB",
-                                }}
-                              />
-                            </div>
-                          ))}
+                          {weekly.map((count, i) => {
+                            const barColor = progressColor(weeklyPct);
+                            const heightPct = count > 0 ? Math.max(12, Math.round((count / maxActivity) * 100)) : 0;
+                            return (
+                              <div key={i} className="flex-1 flex flex-col items-end gap-0 relative h-full justify-end">
+                                {/* filled bar */}
+                                {count > 0 && (
+                                  <div className="w-full rounded-t-sm absolute bottom-[3px]"
+                                    style={{ height: `${heightPct}%`, background: barColor, opacity: 0.9 }} />
+                                )}
+                                {/* baseline tick — always visible */}
+                                <div className="w-full rounded-sm absolute bottom-0"
+                                  style={{ height: 3, background: count > 0 ? barColor : "rgba(255,255,255,0.18)" }} />
+                              </div>
+                            );
+                          })}
                         </div>
                         <div className="flex mt-1">
                           {DAY_LABELS.map((d) => (
@@ -226,12 +267,11 @@ export function DashboardClient({ firstName, totalCompleted, streak, weekly, wee
                       </div>
                     </div>
 
-                    {/* Stats row */}
                     <div className="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-gray-100 dark:border-[#1E293B]">
                       {[
-                        { label: "This week",  value: weeklyCompleted },
-                        { label: "Streak",     value: `${streak}d` },
-                        { label: "Total",      value: totalCompleted },
+                        { label: "This week", value: weeklyCompleted },
+                        { label: "Streak",    value: `${streak}d` },
+                        { label: "Total",     value: totalCompleted },
                       ].map((s) => (
                         <div key={s.label} className="text-center">
                           <p className="text-base font-bold text-gray-900 dark:text-white">{s.value}</p>
@@ -245,22 +285,22 @@ export function DashboardClient({ firstName, totalCompleted, streak, weekly, wee
                   <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#1E293B] rounded-xl p-5">
                     <div className="flex items-center justify-between mb-3">
                       <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Continue Learning</h3>
-                      <button onClick={() => setTab("lessons")} className="text-[11px] font-semibold text-violet-600 hover:underline flex items-center gap-0.5">
+                      <button onClick={() => setTab("lessons")} className="text-[11px] font-semibold text-gray-500 dark:text-[#64748B] hover:text-gray-900 dark:hover:text-white flex items-center gap-0.5 transition-colors">
                         View all <ChevronRight className="h-3 w-3" />
                       </button>
                     </div>
                     {lastLesson ? (
                       <div className="flex items-center gap-4">
                         <div className="flex-1 min-w-0">
-                          <p className="text-[10px] font-semibold text-violet-500 uppercase tracking-wider mb-0.5">{lastLesson.subjectName}</p>
+                          <p className="text-[10px] font-semibold text-gray-400 dark:text-[#64748B] uppercase tracking-wider mb-0.5">{lastLesson.subjectName}</p>
                           <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{lastLesson.courseTitle}</p>
                           <p className="text-xs text-gray-400 dark:text-[#64748B] truncate mb-2">{lastLesson.title}</p>
                           <div className="w-full h-1.5 bg-gray-100 dark:bg-[#1E293B] rounded-full overflow-hidden">
-                            <div className="h-full bg-violet-500 rounded-full transition-all" style={{ width: `${lastLesson.progress}%` }} />
+                            <div className="h-full rounded-full transition-all" style={{ width: `${lastLesson.progress}%`, background: progressColor(lastLesson.progress) }} />
                           </div>
                           <p className="text-[10px] text-gray-400 dark:text-[#64748B] mt-1">{lastLesson.progress}% complete</p>
                         </div>
-                        <Link href={lastLesson.href} className="flex-shrink-0 flex items-center gap-1.5 bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors">
+                        <Link href={lastLesson.href} className="flex-shrink-0 flex items-center gap-1.5 bg-[#111111] dark:bg-white hover:opacity-80 text-white dark:text-[#111111] text-xs font-semibold px-4 py-2 rounded-full transition-opacity">
                           <Play className="h-3.5 w-3.5" /> Resume
                         </Link>
                       </div>
@@ -275,7 +315,7 @@ export function DashboardClient({ firstName, totalCompleted, streak, weekly, wee
 
                 {/* Right: activity + recommended */}
                 <div className="col-span-12 md:col-span-4 space-y-4">
-                  {/* Activity card */}
+                  {/* Activity */}
                   <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#1E293B] rounded-xl overflow-hidden">
                     <div className="px-5 py-4 border-b border-gray-100 dark:border-[#1E293B]">
                       <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Activity</h3>
@@ -300,7 +340,7 @@ export function DashboardClient({ firstName, totalCompleted, streak, weekly, wee
                       ))}
                     </div>
                     <div className="px-5 py-3 bg-gray-50 dark:bg-[#1A1A2E] border-t border-gray-100 dark:border-[#1E293B]">
-                      <button onClick={() => setTab("progress")} className="text-[11px] font-semibold text-violet-600 hover:underline flex items-center gap-1">
+                      <button onClick={() => setTab("progress")} className="text-[11px] font-semibold text-gray-500 dark:text-[#64748B] hover:text-gray-900 dark:hover:text-white flex items-center gap-1 transition-colors">
                         View full progress <ChevronRight className="h-3 w-3" />
                       </button>
                     </div>
@@ -313,14 +353,14 @@ export function DashboardClient({ firstName, totalCompleted, streak, weekly, wee
                         <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Recommended Quizzes</h3>
                         <p className="text-xs text-gray-400 dark:text-[#64748B] mt-0.5">Based on your activity</p>
                       </div>
-                      <button onClick={() => setTab("quizzes")} className="text-[11px] font-semibold text-violet-600 hover:underline">All</button>
+                      <button onClick={() => setTab("quizzes")} className="text-[11px] font-semibold text-gray-500 dark:text-[#64748B] hover:text-gray-900 dark:hover:text-white transition-colors">All</button>
                     </div>
                     <div className="divide-y divide-gray-100 dark:divide-[#1E293B]">
                       {RECOMMENDED_QUIZZES.map((q) => (
                         <Link key={q.title} href={q.href} className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 dark:hover:bg-[#1A1A2E] transition-colors group">
                           <div className="h-8 w-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: q.iconBg, color: q.iconColor }}>{q.icon}</div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-[12px] font-semibold text-gray-800 dark:text-[#CBD5E1] truncate group-hover:text-violet-600 transition-colors">{q.title}</p>
+                            <p className="text-[12px] font-semibold text-gray-800 dark:text-[#CBD5E1] truncate">{q.title}</p>
                             <p className="text-[10px] text-gray-400 dark:text-[#64748B]">{q.meta}</p>
                           </div>
                           <ChevronRight className="h-3.5 w-3.5 text-gray-300 dark:text-[#334155] shrink-0" />
@@ -332,7 +372,7 @@ export function DashboardClient({ firstName, totalCompleted, streak, weekly, wee
 
               </div>
 
-              {/* Bottom: AI quizzes row (like Funding Rounds) */}
+              {/* Bottom: AI quizzes row */}
               <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#1E293B] rounded-xl overflow-hidden">
                 <div className="px-6 py-4 border-b border-gray-100 dark:border-[#1E293B]">
                   <h3 className="text-sm font-semibold text-gray-900 dark:text-white">AI-Recommended Quizzes</h3>
@@ -367,21 +407,7 @@ export function DashboardClient({ firstName, totalCompleted, streak, weekly, wee
                 <p className="text-sm text-gray-500 dark:text-[#64748B] mt-0.5">Pick a subject and dive into AI-generated courses.</p>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {SUBJECT_ITEMS.map((s) => {
-                  const def = SUBJECT_ICON_MAP[s.id];
-                  return (
-                    <Link key={s.id} href={`/learn/${s.id}`}>
-                      <div className="group relative flex flex-col overflow-hidden rounded-2xl h-full min-h-[120px] transition-all hover:shadow-md cursor-pointer">
-                        <SubjectShaderCard subjectId={s.id} />
-                        <div className="relative z-10 flex flex-col p-5 h-full">
-                          {def && <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl" style={{ background: "rgba(255,255,255,0.15)", color: "#fff" }}><def.Icon className="h-5 w-5" /></div>}
-                          <h3 className="text-sm font-bold text-white mb-0.5">{s.name}</h3>
-                          <p className="text-xs text-white/60">{s.courses} courses</p>
-                        </div>
-                      </div>
-                    </Link>
-                  );
-                })}
+                {SUBJECT_ITEMS.map((s) => <SubjectCard key={s.id} s={s} href={`/subject/${s.id}`} />)}
               </div>
             </div>
           )}
@@ -394,21 +420,7 @@ export function DashboardClient({ firstName, totalCompleted, streak, weekly, wee
                 <p className="text-sm text-gray-500 dark:text-[#64748B] mt-0.5">Test your knowledge with AI-generated quizzes.</p>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {SUBJECT_ITEMS.map((s) => {
-                  const def = SUBJECT_ICON_MAP[s.id];
-                  return (
-                    <Link key={s.id} href={`/${s.id}/quiz`}>
-                      <div className="group relative flex flex-col overflow-hidden rounded-2xl h-full min-h-[120px] transition-all hover:shadow-md cursor-pointer">
-                        <SubjectShaderCard subjectId={s.id} />
-                        <div className="relative z-10 flex flex-col p-5 h-full">
-                          {def && <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl" style={{ background: "rgba(255,255,255,0.15)", color: "#fff" }}><def.Icon className="h-5 w-5" /></div>}
-                          <h3 className="text-sm font-bold text-white mb-0.5">{s.name}</h3>
-                          <p className="text-xs text-white/60">Start a quiz</p>
-                        </div>
-                      </div>
-                    </Link>
-                  );
-                })}
+                {SUBJECT_ITEMS.map((s) => <SubjectCard key={s.id} s={s} href={`/subject/${s.id}`} />)}
               </div>
             </div>
           )}
@@ -436,12 +448,16 @@ export function DashboardClient({ firstName, totalCompleted, streak, weekly, wee
                   <span className="text-xs text-gray-400 dark:text-[#64748B] bg-gray-100 dark:bg-[#1E293B] px-2.5 py-1 rounded-lg">Last 7 days</span>
                 </div>
                 <div className="h-52 flex items-end gap-3">
-                  {weekly.map((count, i) => (
-                    <div key={i} className="flex-1 flex flex-col items-center gap-1.5">
-                      {count > 0 && <span className="text-[10px] text-gray-400 dark:text-[#64748B]">{count}</span>}
-                      <div className="w-full rounded-t-md" style={{ height: `${Math.max(4, Math.round((count / maxActivity) * 100))}%`, minHeight: 4, background: count > 0 ? "#7C3AED" : "#E5E7EB" }} />
+                  {weekly.map((count, i) => {
+                    const barColor = progressColor(weeklyPct);
+                    return (
+                    <div key={i} className="flex-1 flex flex-col items-center gap-1.5 relative h-full justify-end">
+                      {count > 0 && <span className="text-[10px] text-gray-400 dark:text-[#64748B] absolute" style={{ bottom: `${Math.max(12, Math.round((count / maxActivity) * 100))}%` }}>{count}</span>}
+                      {count > 0 && <div className="w-full rounded-t-md absolute bottom-[4px]" style={{ height: `${Math.max(12, Math.round((count / maxActivity) * 100))}%`, background: barColor }} />}
+                      <div className="w-full rounded-sm absolute bottom-0" style={{ height: 4, background: count > 0 ? barColor : "rgba(0,0,0,0.1)" }} />
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
                 <div className="flex mt-2">
                   {DAY_LABELS.map((d) => <span key={d} className="flex-1 text-center text-[10px] text-gray-400 dark:text-[#64748B]">{d}</span>)}
@@ -467,7 +483,7 @@ export function DashboardClient({ firstName, totalCompleted, streak, weekly, wee
               <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#1E293B] rounded-xl p-6">
                 <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">Subscription</h3>
                 <p className="text-sm text-gray-500 dark:text-[#64748B] mb-4">Manage your plan and billing.</p>
-                <Link href="/subscription" className="inline-flex items-center gap-2 bg-violet-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-violet-700 transition-colors">
+                <Link href="/subscription" className="inline-flex items-center gap-2 bg-[#111111] dark:bg-white text-white dark:text-[#111111] px-4 py-2 rounded-full text-sm font-semibold hover:opacity-80 transition-opacity">
                   Manage Subscription <ExternalLink className="h-3.5 w-3.5" />
                 </Link>
               </div>
@@ -475,12 +491,12 @@ export function DashboardClient({ firstName, totalCompleted, streak, weekly, wee
                 <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Quick Links</h3>
                 <div className="flex flex-wrap gap-2">
                   {[
-                    { label: "Library",        href: "/library" },
-                    { label: "Upload Notes",   href: "/upload" },
-                    { label: "Build Roadmap",  href: "/roadmap" },
-                    { label: "Browse Subjects",href: "/subjects" },
+                    { label: "Library",         href: "/library" },
+                    { label: "Upload Notes",    href: "/upload" },
+                    { label: "Build Roadmap",   href: "/roadmap" },
+                    { label: "Browse Subjects", href: "/subjects" },
                   ].map((l) => (
-                    <Link key={l.href} href={l.href} className="inline-flex items-center gap-1.5 border border-gray-200 dark:border-[#1E293B] rounded-lg px-3 py-1.5 text-sm text-gray-600 dark:text-[#94A3B8] hover:border-violet-400 hover:text-violet-600 transition-colors">
+                    <Link key={l.href} href={l.href} className="inline-flex items-center gap-1.5 border border-gray-200 dark:border-[#1E293B] rounded-lg px-3 py-1.5 text-sm text-gray-600 dark:text-[#94A3B8] hover:border-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
                       {l.label} <ExternalLink className="h-3 w-3" />
                     </Link>
                   ))}

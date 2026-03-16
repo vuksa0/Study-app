@@ -41,7 +41,7 @@ export const subjects: Subject[] = [
     color: "from-purple-600 to-purple-400",
     icon: "science",
     iconColor: "#8B5CF6",
-    modes: ["quiz", "flashcards", "lesson", "problems"],
+    modes: ["problems"],
     topics: [
       { id: "mechanics", name: "Mechanics", description: "Forces, motion, energy" },
       { id: "electricity", name: "Electricity", description: "Charge, current, resistance" },
