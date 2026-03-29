@@ -1,11 +1,14 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest, NextResponse } from "next/server";
+import { guardAI } from "@/lib/ai-guard";
 
 export const maxDuration = 30;
 
 const client = new Anthropic();
 
 export async function POST(req: NextRequest) {
+  const guard = await guardAI();
+  if (guard) return guard;
 
   try {
     const { messages, subjectName } = await req.json();

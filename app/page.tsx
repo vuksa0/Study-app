@@ -58,11 +58,8 @@ export default function Home() {
 
 
           <div className="flex flex-col items-center justify-center gap-4 md:flex-row">
-            <Link href="/pricing">
+            <Link href="/onboarding">
               <MotionButton label="Get started" />
-            </Link>
-            <Link href="/upload">
-              <MotionButton label="Upload your notes" />
             </Link>
           </div>
         </div>
@@ -144,7 +141,7 @@ export default function Home() {
             {/* Left — Grade improvement */}
             <div className="relative overflow-hidden rounded-3xl bg-[#1D4ED8] p-8 md:p-10">
               <h3 className="mb-10 text-2xl font-black leading-tight text-white md:text-[28px]">
-                Improve your grade or<br/>get your money back
+                Students who use Thinkio<br/>consistently improve
               </h3>
 
               {/* Grade scale */}
@@ -152,14 +149,14 @@ export default function Home() {
                 {/* Arrow labels */}
                 <div className="mb-3 flex items-end justify-between px-2">
                   <div className="flex flex-col items-center gap-1">
-                    <span className="text-center text-[11px] font-semibold leading-tight text-white/75">Your Current<br/>Grade</span>
+                    <span className="text-center text-[11px] font-semibold leading-tight text-white/75">Where most<br/>students start</span>
                     <svg width="16" height="20" viewBox="0 0 16 20" fill="none">
                       <path d="M8 0 L8 14" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
                       <path d="M3 10 L8 16 L13 10" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
                     </svg>
                   </div>
                   <div className="flex flex-col items-center gap-1">
-                    <span className="text-center text-[11px] font-semibold leading-tight text-white/75">Your Grade<br/>with Thinkio</span>
+                    <span className="text-center text-[11px] font-semibold leading-tight text-white/75">Where they<br/>end up</span>
                     <svg width="16" height="20" viewBox="0 0 16 20" fill="none">
                       <path d="M8 0 L8 14" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
                       <path d="M3 10 L8 16 L13 10" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
@@ -187,8 +184,8 @@ export default function Home() {
                 </div>
               </div>
 
-              <p className="text-2xl font-black text-white">2 grade levels up —</p>
-              <p className="text-2xl font-black text-[#F59E0B]">guaranteed</p>
+              <p className="text-2xl font-black text-white">Study smarter, not longer —</p>
+              <p className="text-2xl font-black text-[#F59E0B]">starting today</p>
             </div>
 
             {/* Right — Price comparison */}

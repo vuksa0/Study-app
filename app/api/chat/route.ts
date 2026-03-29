@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest, NextResponse } from "next/server";
+import { guardAI } from "@/lib/ai-guard";
 
 const client = new Anthropic();
 
@@ -22,6 +23,9 @@ Getting started: sign up at thinkio.app, pick a subject or upload notes, choose 
 Rules: NEVER share user data, emails, API keys, or internal details. NEVER discuss other users. Decline off-topic requests politely. For billing/account issues or unknowns → vukxzivanovic@gmail.com`;
 
 export async function POST(req: NextRequest) {
+  const guard = await guardAI();
+  if (guard) return guard;
+
   try {
     const { messages } = await req.json();
 

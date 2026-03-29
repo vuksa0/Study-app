@@ -19,7 +19,35 @@
       "Bash(vercel --prod)",
       "Bash(stripe --version)",
       "Bash(stripe config:*)",
-      "Bash(vercel env:*)"
+      "Bash(vercel env:*)",
+      "Read(//c/Users/vukzi/thinkio-mobile/**)",
+      "Bash(npm install:*)",
+      "Bash(vercel ls:*)",
+      "Bash(npx expo:*)",
+      "Bash(npm run:*)",
+      "Bash(winget install:*)",
+      "Bash(nvm install:*)",
+      "Bash(cmd /c \"nvm install 20 && nvm use 20\")",
+      "Bash(cmd /c \"nvm --version\")",
+      "Read(//c/Users/vukzi/AppData/Roaming/**)",
+      "Read(//c/Program Files/**)",
+      "Read(//c/Users/vukzi/**)",
+      "Bash(/c/Users/vukzi/AppData/Local/nvm/nvm.exe install:*)",
+      "Bash(./nvm.exe install:*)",
+      "Bash(cmd /c \"cd c:\\\\Users\\\\vukzi\\\\thinkio-mobile && npm install expo@~55.0.6 expo-router@~55.0.5 expo-constants@~55.0.7 expo-font@~55.0.4 expo-linking@~55.0.7 expo-secure-store@~55.0.8 expo-status-bar@~55.0.4 expo-web-browser@~55.0.9 expo-linear-gradient@~55.0.8 react-native@0.83.2 react@19.0.0 react-native-reanimated@4.2.1 react-native-gesture-handler@~2.30.0 --legacy-peer-deps 2>&1\")",
+      "Bash(cmd /c \"cd c:\\\\Users\\\\vukzi\\\\thinkio-mobile && npm install expo@~55.0.6 expo-router@~55.0.5 expo-constants@~55.0.7 expo-font@~55.0.4 expo-linking@~55.0.7 expo-secure-store@~55.0.8 expo-status-bar@~55.0.4 expo-web-browser@~55.0.9 expo-linear-gradient@~55.0.8 react-native@0.83.2 react@19.0.0 react-native-reanimated@4.2.1 react-native-gesture-handler@~2.30.0 --legacy-peer-deps\")",
+      "Bash(cmd /c \"cd c:\\\\Users\\\\vukzi\\\\thinkio-mobile && npm install expo@latest --legacy-peer-deps\")",
+      "Bash(powershell -Command \"cd ''C:\\\\Users\\\\vukzi\\\\thinkio-mobile''; npm install expo@~55.0.6 expo-router@~55.0.5 react-native@0.83.2 react@19.0.0 react-native-reanimated@4.2.1 react-native-gesture-handler@~2.30.0 expo-constants@~55.0.7 expo-font@~55.0.4 expo-linking@~55.0.7 expo-secure-store@~55.0.8 expo-status-bar@~55.0.4 expo-web-browser@~55.0.9 expo-linear-gradient@~55.0.8 --legacy-peer-deps 2>&1 | Select-Object -Last 5\")",
+      "Bash(/c/Users/vukzi/AppData/Local/nvm/v24.14.0/node.exe /c/Users/vukzi/AppData/Local/nvm/v24.14.0/node_modules/npm/bin/npm-cli.js install expo@~55.0.6 expo-router@~55.0.5 react-native@0.83.2 react@19.0.0 react-native-reanimated@4.2.1 react-native-gesture-handler@~2.30.0 expo-constants@~55.0.7 expo-font@~55.0.4 expo-linking@~55.0.7 expo-secure-store@~55.0.8 expo-status-bar@~55.0.4 expo-web-browser@~55.0.9 expo-linear-gradient@~55.0.8 --legacy-peer-deps)",
+      "Bash(/c/Users/vukzi/AppData/Local/nvm/v24.14.0/node.exe /c/Users/vukzi/AppData/Local/nvm/v24.14.0/node_modules/npm/bin/npm-cli.js run tunnel)",
+      "Bash(/c/Users/vukzi/AppData/Local/nvm/v24.14.0/node.exe --version)",
+      "Bash(/c/Users/vukzi/AppData/Local/nvm/v24.14.0/node.exe /c/Users/vukzi/AppData/Local/nvm/v24.14.0/node_modules/npm/bin/npm-cli.js list --depth=0)",
+      "Bash(curl -s https://expo.dev/go)",
+      "Bash(ls /c/Users/vukzi/thinkio-mobile/*.js /c/Users/vukzi/thinkio-mobile/*.ts /c/Users/vukzi/thinkio-mobile/*.json)",
+      "Bash(find /c/Users/vukzi/thinkio-mobile/app -name *.tsx -o -name *.ts)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\vukzi\\thinkio-mobile"
     ]
   }
 }

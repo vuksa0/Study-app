@@ -8,6 +8,7 @@ import { getCustomSubjects } from "@/lib/custom-subjects";
 import type { Subject } from "@/lib/subjects";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
+import { SubjectShaderCard } from "@/components/SubjectShaderCard";
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import { BookOpen, Zap, FileText, Calculator, Upload, X, ChevronDown, ArrowRight, Camera } from "lucide-react";
 import { Spinner } from "@/components/ui/ios-spinner";
@@ -304,6 +305,8 @@ function UploadContent() {
   const [quizRevealed, setQuizRevealed] = useState(false);
   const [quizScore, setQuizScore] = useState(0);
   const [quizFinished, setQuizFinished] = useState(false);
+  const [quizAnswers, setQuizAnswers] = useState<Record<number, number>>({});
+  const [quizTitle, setQuizTitle] = useState("");
 
   const [cardIndex, setCardIndex] = useState(0);
   const [cardFlipped, setCardFlipped] = useState(false);
@@ -488,8 +491,9 @@ function UploadContent() {
         setQuestions(data.questions ?? []);
         setQuizCurrent(0); setQuizSelected(null); setQuizRevealed(false);
         setQuizScore(0); setQuizFinished(false);
+        setQuizAnswers({}); setQuizTitle(`${subjectLabel} Quiz`);
         setStep("quiz");
-        saveToLibrary("quiz", { questions: data.questions }, `${subjectLabel} Quiz`);
+        // quiz is saved at finish with user answers
       } else if (mode === "flashcards") {
         setFlashcards(data.flashcards ?? []);
         setCardIndex(0); setCardFlipped(false);
@@ -526,6 +530,13 @@ function UploadContent() {
     return true;
   });
 
+  // Auto-switch mode when subject changes and current mode is unavailable
+  useEffect(() => {
+    if (availableModes.length > 0 && !availableModes.find((m) => m.id === mode)) {
+      setMode(availableModes[0].id as Mode);
+    }
+  }, [subject?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // ── Pick subject screen ──────────────────────────────────────────────────
   if (step === "pick-subject") return (
     <div className="min-h-screen bg-white dark:bg-[#111111]">
@@ -539,12 +550,12 @@ function UploadContent() {
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 mb-8">
           {allSubjects.map((s) => (
             <button key={s.id} onClick={() => { setSubject(s); setStep("upload"); }}
-              className="group flex flex-col rounded-2xl border border-[#E2E8F0] dark:border-[#2D3748] bg-white dark:bg-[#1A1A1A] p-5 text-left transition-all hover:border-[#CBD5E1] hover:shadow-md">
-              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-[#F1F5F9] dark:bg-[#2D3748]">
-                <BookOpen className="h-5 w-5 text-[#111111] dark:text-white" />
+              className="group relative flex flex-col rounded-2xl overflow-hidden p-5 text-left transition-all hover:scale-[1.02] hover:shadow-xl duration-200 aspect-[4/3]">
+              <SubjectShaderCard subjectId={s.id} />
+              <div className="relative z-10 flex flex-col h-full">
+                <p className="font-bold text-white text-sm mt-auto">{s.name}</p>
+                <p className="text-xs mt-0.5 text-white/60">Start →</p>
               </div>
-              <p className="font-bold text-[#111111] dark:text-white text-sm">{s.name}</p>
-              <p className="text-xs mt-0.5 text-[#94A3B8]">{s.topics.length} topics</p>
             </button>
           ))}
         </div>
@@ -755,7 +766,7 @@ function UploadContent() {
             <p className="mb-8 text-sm text-[#64748B] dark:text-[#94A3B8]">{quizScore} of {questions.length} correct</p>
             <div className="flex flex-col gap-3">
               <InteractiveHoverButton variant="dark" text="Retry Quiz" className="w-full justify-center h-12"
-                onClick={() => { setQuizCurrent(0); setQuizSelected(null); setQuizRevealed(false); setQuizScore(0); setQuizFinished(false); }} />
+                onClick={() => { setQuizCurrent(0); setQuizSelected(null); setQuizRevealed(false); setQuizScore(0); setQuizFinished(false); setQuizAnswers({}); }} />
               <InteractiveHoverButton variant="light" text="Upload New Files" className="w-full justify-center h-12" onClick={resetToUpload} />
             </div>
           </div>
@@ -796,6 +807,7 @@ function UploadContent() {
                     if (quizRevealed) return;
                     setQuizSelected(idx); setQuizRevealed(true);
                     if (idx === q.answer) setQuizScore((s) => s + 1);
+                    setQuizAnswers((prev) => ({ ...prev, [quizCurrent]: idx }));
                   }}
                   className="w-full text-left px-5 py-3.5 rounded-2xl text-sm font-medium transition-all border"
                   style={{ background: bg, borderColor: border, color, cursor: quizRevealed ? "default" : "pointer" }}>
@@ -814,8 +826,13 @@ function UploadContent() {
               <InteractiveHoverButton variant="dark" className="w-full justify-center h-12"
                 text={quizCurrent + 1 >= questions.length ? "See Results" : "Next Question"}
                 onClick={() => {
-                  if (quizCurrent + 1 >= questions.length) setQuizFinished(true);
-                  else { setQuizCurrent((c) => c + 1); setQuizSelected(null); setQuizRevealed(false); }
+                  if (quizCurrent + 1 >= questions.length) {
+                    const finalAnswers = { ...quizAnswers };
+                    saveToLibrary("quiz", { questions, userAnswers: finalAnswers }, quizTitle || "Quiz");
+                    setQuizFinished(true);
+                  } else {
+                    setQuizCurrent((c) => c + 1); setQuizSelected(null); setQuizRevealed(false);
+                  }
                 }} />
             </>
           )}

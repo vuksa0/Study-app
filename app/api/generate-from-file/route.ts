@@ -176,10 +176,10 @@ Return ONLY valid JSON, no markdown, no explanation:
 {
   "problems": [
     {
-      "problem": "Full problem statement with all necessary data",
-      "hint": "A helpful hint without giving away the answer",
-      "answer": "The exact correct answer",
-      "steps": ["Step 1: ...", "Step 2: ...", "Step 3: ..."]
+      "problem": "Full problem statement. Wrap ALL math in LaTeX delimiters: $inline$ or $$block$$. Use \\\\frac{a}{b} for fractions, x^{2} for exponents, \\\\sqrt{x} for roots, \\\\cdot for multiply.",
+      "hint": "A helpful hint without giving away the answer. Wrap math in $...$.",
+      "answer": "The exact correct answer. Wrap math in $...$.",
+      "steps": ["Step 1: ... Wrap math in $...$.", "Step 2: ...", "Step 3: ..."]
     }
   ]
 }
@@ -190,6 +190,8 @@ Rules:
 - Each problem must be fully solvable with clear steps
 - steps should be 3-6 clear steps showing the full solution
 - Vary difficulty slightly across the set
+- ALWAYS use \\frac{}{} for fractions — NEVER write a/b as plain text
+- ALWAYS use x^{n} for exponents — NEVER write x^2 without braces
 - Write in English`;
   } else {
     instruction = `Based on the content above (${fileNames.join(", ")}), write a clear, well-structured lesson.

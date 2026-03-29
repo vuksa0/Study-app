@@ -5,10 +5,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSubject, getTopic } from "@/lib/subjects";
 import { urgencyPrompt } from "@/lib/test-date";
 import type { TestDate } from "@/lib/test-date";
+import { guardAI } from "@/lib/ai-guard";
 
 const client = new Anthropic();
 
 export async function POST(req: NextRequest) {
+  const guard = await guardAI();
+  if (guard) return guard;
+
   const { subjectId, topicId, count = 5, subjectName, topicName, topicDescription, testDate, language = "English" } = await req.json();
   const urgency = urgencyPrompt(testDate as TestDate | null);
 

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kontakt oss – Soria Moria Trafikkskole</title>
+  <meta name="description" content="Kontakt Soria Moria Trafikkskole. Ring, send e-post eller bruk kontaktskjemaet. Vi er på Torshov i Oslo." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">
+        <img src="https://s3cdn.tabs.no/skole/821/img/logo-d35cc0b0fe27d555f8a63d0026bb5be3.png?v=4.2.0" alt="Soria Moria Trafikkskole" style="height:80px; width:auto; display:block; filter: invert(1); mix-blend-mode: screen;" />
+      </a>
+      <div class="nav-links">
+        <a href="kurs.html">Kurs</a>
+        <a href="priser.html">Priser</a>
+        <a href="nyheter.html">Nyheter</a>
+        <a href="ansatte.html">Ansatte</a>
+        <a href="kontakt.html" class="btn-nav">Kontakt oss</a>
+      </div>
+      <button class="nav-toggle" aria-label="Meny">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="nav-mobile">
+      <a href="kurs.html">Kurs</a>
+      <a href="priser.html">Priser</a>
+      <a href="nyheter.html">Nyheter</a>
+      <a href="ansatte.html">Ansatte</a>
+      <a href="kontakt.html">Kontakt oss</a>
+    </div>
+  </nav>
+
+  <!-- Page Hero -->
+  <div class="page-hero">
+    <div class="container">
+      <span class="label">Ta kontakt</span>
+      <h1>Kontakt oss</h1>
+      <p>Vi er alltid tilgjengelige for spørsmål, timebestilling eller bare en hyggelig prat om kjøreopplæring.</p>
+    </div>
+  </div>
+
+  <!-- Contact Section -->
+  <section class="section">
+    <div class="container">
+      <div class="grid-2" style="gap: 3rem; align-items: start;">
+
+        <!-- Contact Info -->
+        <div class="fade-in">
+          <div class="contact-info-card">
+            <h3>Kontaktinformasjon</h3>
+
+            <div class="contact-item">
+              <span class="contact-item-icon"></span>
+              <div class="contact-item-text">
+                <strong>Johnny (Daglig leder)</strong>
+                <a href="tel:91728977">91 72 89 77</a>
+              </div>
+            </div>
+
+            <div class="contact-item">
+              <span class="contact-item-icon"></span>
+              <div class="contact-item-text">
+                <strong>Bojan (Kjørelærer)</strong>
+                <a href="tel:45858885">458 58 885</a>
+              </div>
+            </div>
+
+            <div class="contact-item">
+              <span class="contact-item-icon">️</span>
+              <div class="contact-item-text">
+                <strong>E-post</strong>
+                <a href="mailto:soriaskole@soriaskole.no">soriaskole@soriaskole.no</a>
+              </div>
+            </div>
+
+            <div class="contact-item">
+              <span class="contact-item-icon"></span>
+              <div class="contact-item-text">
+                <strong>Adresse</strong>
+                Kulturslottet Soria Moria<br>
+                Torshov, Oslo
+              </div>
+            </div>
+
+            <div class="contact-item">
+              <span class="contact-item-icon"></span>
+              <div class="contact-item-text">
+                <strong>Åpningstider</strong>
+                Mandag–fredag: 08:00–18:00<br>
+                Lørdag: 09:00–15:00
+              </div>
+            </div>
+
+            <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.2); margin: 1.5rem 0;" />
+
+            <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+              <a href="https://www.facebook.com" target="_blank" rel="noopener"
+                 style="background:rgba(255,255,255,0.15); color:#fff; padding:0.5rem 1rem; border-radius:4px; font-size:0.85rem; font-weight:600; display:inline-block;">
+                 Facebook
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Form -->
+        <div class="fade-in">
+          <div id="kurs-banner" style="display:none; background:#fdf0f3; border:1.5px solid #f5c6d0; border-radius:6px; padding:0.9rem 1.1rem; margin-bottom:1.5rem; font-size:0.9rem; color:var(--black);">
+            Bestilling for: <strong id="kurs-banner-name"></strong>
+            <a href="kurs.html" style="margin-left:0.75rem; font-size:0.8rem; color:var(--grey);">Bytt kurs</a>
+          </div>
+          <h2 style="margin-bottom: 0.5rem;">Send oss en melding</h2>
+          <p style="margin-bottom: 2rem;">Fyll ut skjemaet, så svarer vi deg så snart som mulig – vanligvis innen én arbeidsdag.</p>
+
+          <form class="contact-form" id="contact-form" novalidate>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="navn">Navn *</label>
+                <input type="text" id="navn" name="navn" placeholder="Ola Nordmann" required />
+              </div>
+              <div class="form-group">
+                <label for="telefon">Telefon</label>
+                <input type="tel" id="telefon" name="telefon" placeholder="900 00 000" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="epost">E-post *</label>
+              <input type="email" id="epost" name="epost" placeholder="ola@eksempel.no" required />
+            </div>
+            <div class="form-group">
+              <label for="klasse">Hvilken klasse er du interessert i?</label>
+              <select id="klasse" name="klasse">
+                <option value="">Velg klasse…</option>
+                <option value="baut">BAut – Personbil automat</option>
+                <option value="b">B – Personbil manuell</option>
+                <option value="tg">TG – Trafikalt grunnkurs</option>
+                <option value="annet">Annet</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="melding">Melding *</label>
+              <textarea id="melding" name="melding" placeholder="Skriv din melding her…" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%;">Send melding</button>
+          </form>
+        </div>
+
+      </div>
+
+      <!-- Map -->
+      <div class="map-embed fade-in" style="margin-top: 3.5rem;">
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2000.1234567890!2d10.76!3d59.93!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x46416e7d3e4e4e4f%3A0x1234567890abcdef!2sKulturslottet%20Soria%20Moria%2C%20Torshov%2C%20Oslo!5e0!3m2!1sno!2sno!4v1234567890"
+          allowfullscreen=""
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          title="Kart – Kulturslottet Soria Moria, Torshov, Oslo">
+        </iframe>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <h3>Soria Moria Trafikkskole</h3>
+          <p>Kulturslottet Soria Moria, Torshov, Oslo. Vi tenker grønt og tilbyr opplæring på Automatik og manuelt gir.</p>
+          <br/>
+          <span class="hiring-notice">Vi søker 1–2 lærere!</span>
+        </div>
+        <div class="footer-col">
+          <h4>Sider</h4>
+          <ul>
+            <li><a href="kurs.html">Kursoversikt</a></li>
+            <li><a href="priser.html">Klasser &amp; Priser</a></li>
+            <li><a href="nyheter.html">Nyheter</a></li>
+            <li><a href="ansatte.html">Ansatte</a></li>
+            <li><a href="kontakt.html">Kontakt oss</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Nyttige lenker</h4>
+          <ul>
+            <li><a href="https://www.vegvesen.no" target="_blank" rel="noopener">Din side (Vegvesen)</a></li>
+            <li><a href="https://www.teoritentamen.no" target="_blank" rel="noopener">Teoritentamen</a></li>
+            <li><a href="https://www.ntf.no" target="_blank" rel="noopener">Norges Trafikkskoleforbund</a></li>
+            <li><a href="https://www.facebook.com" target="_blank" rel="noopener">Facebook</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2025 Soria Moria Trafikkskole</span>
+        <span>soriaskole@soriaskole.no &nbsp;·&nbsp; 91 72 89 77</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+  <script>
+    const kursNames = {
+      baut: 'BAut – Personbil automat',
+      b:    'B – Personbil manuell',
+      tg:   'TG – Trafikalt grunnkurs',
+    };
+    const param = new URLSearchParams(window.location.search).get('kurs');
+    if (param && kursNames[param]) {
+      const select = document.getElementById('klasse');
+      const banner = document.getElementById('kurs-banner');
+      const bannerName = document.getElementById('kurs-banner-name');
+      select.value = param;
+      bannerName.textContent = kursNames[param];
+      banner.style.display = 'block';
+      select.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  </script>
+</body>
+</html>

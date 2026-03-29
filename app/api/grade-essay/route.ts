@@ -2,10 +2,14 @@ import Anthropic from "@anthropic-ai/sdk";
 
 export const maxDuration = 60;
 import { NextRequest, NextResponse } from "next/server";
+import { guardAI } from "@/lib/ai-guard";
 
 const client = new Anthropic();
 
 export async function POST(req: NextRequest) {
+  const guard = await guardAI();
+  if (guard) return guard;
+
   const { text, prompt: essayPrompt } = await req.json();
 
   if (!text || String(text).trim().length < 20) {

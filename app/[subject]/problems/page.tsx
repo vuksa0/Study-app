@@ -43,6 +43,10 @@ const MATH_KEYS: { label: string; value: string }[] = [
   { label: "≈", value: "≈" }, { label: "∞", value: "∞" }, { label: "%", value: "%" },
   { label: "θ", value: "θ" }, { label: "α", value: "α" }, { label: "β", value: "β" },
   { label: "Δ", value: "Δ" }, { label: "∛", value: "∛" }, { label: "/", value: "/" },
+  { label: "sin", value: "sin(" }, { label: "cos", value: "cos(" }, { label: "tan", value: "tan(" },
+  { label: "log", value: "log(" }, { label: "ln", value: "ln(" }, { label: "|x|", value: "|" },
+  { label: "sin⁻¹", value: "sin⁻¹(" }, { label: "cos⁻¹", value: "cos⁻¹(" }, { label: "tan⁻¹", value: "tan⁻¹(" },
+  { label: "eˣ", value: "e^" }, { label: "!", value: "!" }, { label: "∑", value: "∑" },
 ];
 
 function ProblemsContent() {

@@ -1,11 +1,10 @@
 'use client'
 
 import { FC } from 'react'
-import { ArrowRight } from 'lucide-react'
 import { clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 
-function cn(...inputs: any[]) { return twMerge(clsx(inputs)) }
+function cn(...inputs: unknown[]) { return twMerge(clsx(inputs)) }
 
 interface Props {
   label: string
@@ -14,27 +13,26 @@ interface Props {
   animate?: boolean
   delay?: number
   onClick?: () => void
+  type?: 'button' | 'submit'
+  disabled?: boolean
 }
 
-const MotionButton: FC<Props> = ({ label, classes, onClick }) => {
+const MotionButton: FC<Props> = ({ label, variant = 'primary', classes, onClick, type = 'button', disabled }) => {
+  const isPrimary = variant !== 'secondary'
   return (
     <button
+      type={type}
       onClick={onClick}
+      disabled={disabled}
       className={cn(
-        'bg-background group relative h-auto w-50 cursor-pointer rounded-full border-[none] p-1 outline-none',
+        'inline-flex items-center justify-center rounded-full px-7 py-3 text-[15px] font-semibold tracking-tight transition-opacity hover:opacity-80 active:scale-[0.97] duration-150 disabled:opacity-50 disabled:cursor-not-allowed',
+        isPrimary
+          ? 'bg-[#111111] text-white'
+          : 'bg-white text-[#111111] border border-[#111111]',
         classes
       )}
     >
-      <span
-        className='circle bg-foreground m-0 block h-12 w-12 overflow-hidden rounded-full duration-500 group-hover:w-full'
-        aria-hidden='true'
-      ></span>
-      <div className='icon absolute top-1/2 left-4 translate-x-0 -translate-y-1/2 duration-500 group-hover:translate-x-[0.4rem]'>
-        <ArrowRight className='text-background size-6' />
-      </div>
-      <span className='button-text text-foreground group-hover:text-background font-manrope absolute top-2/4 left-2/4 ml-4 -translate-x-2/4 -translate-y-2/4 text-center text-lg font-medium tracking-tight whitespace-nowrap duration-500'>
-        {label}
-      </span>
+      {label}
     </button>
   )
 }

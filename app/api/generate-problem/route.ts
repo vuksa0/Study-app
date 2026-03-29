@@ -5,11 +5,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSubject, getTopic } from "@/lib/subjects";
 import { urgencyPrompt } from "@/lib/test-date";
 import type { TestDate } from "@/lib/test-date";
+import { guardAI } from "@/lib/ai-guard";
 
 const client = new Anthropic();
 
 export async function POST(req: NextRequest) {
-  const { subjectId, topicId, subjectName, topicName, topicDescription, difficulty = "medium", testDate, language = "English" } = await req.json();
+  const guard = await guardAI();
+  if (guard) return guard;
+
+  const { subjectId, topicId, subjectName, topicName, topicDescription, difficulty = "medium", testDate, language = "English", uploadedContent } = await req.json();
   const urgency = urgencyPrompt(testDate as TestDate | null);
 
   let resolvedSubjectName: string;
@@ -54,8 +58,12 @@ export async function POST(req: NextRequest) {
       ? "Make it challenging — multi-step reasoning, requires solid understanding."
       : "Moderate difficulty — one or two steps, tests solid understanding of the concept.";
 
-  const prompt = `Generate exactly one ${difficulty} problem for ${resolvedSubjectName}${topicPart}.
+  const uploadedContext = uploadedContent
+    ? `\nThe student uploaded notes/problems. Here is the content:\n---\n${uploadedContent.slice(0, 8000)}\n---\nGenerate a problem SIMILAR in topic and style to the material above — same subject matter, different numbers or scenarios.\n`
+    : "";
 
+  const prompt = `Generate exactly one ${difficulty} problem for ${resolvedSubjectName}${topicPart}.
+${uploadedContext}
 ${domainNotes}
 ${difficultyNote}
 

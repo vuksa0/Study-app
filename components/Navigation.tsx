@@ -1,20 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { Sun, Moon, ChevronDown, BookOpen, Brain, Zap, PenTool, Code2, FileText, Map } from "lucide-react";
+import { ChevronDown, BookOpen, Brain, Zap, PenTool, Code2, FileText, Map } from "lucide-react";
 import { SUBJECT_ICON_MAP } from "@/components/SubjectIcons";
 import { useState, useEffect, useRef } from "react";
 import { useTheme } from "next-themes";
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
-import { UserButton, Show } from "@clerk/nextjs";
-import { SubscriptionTab } from "@/components/SubscriptionTab";
-import { CreditCard } from "lucide-react";
+import { Show } from "@clerk/nextjs";
+import { UserAvatar } from "@/components/UserAvatar";
 import { ThinkioLogo } from "@/components/ThinkioLogo";
 import { useLocale } from "@/components/LocaleProvider";
 import { SUPPORTED_LANGUAGES, type LangCode } from "@/lib/i18n";
 
 export function Navigation() {
-  const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [subjectsOpen, setSubjectsOpen] = useState(false);
   const [featuresOpen, setFeaturesOpen] = useState(false);
@@ -26,6 +24,8 @@ export function Navigation() {
   const currentLang = SUPPORTED_LANGUAGES.find((l) => l.code === language);
 
   useEffect(() => setMounted(true), []);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const isDark = false;
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -56,7 +56,6 @@ export function Navigation() {
     { href: "/roadmap", icon: <Map className="h-4 w-4" />, color: "#EC4899", label: t('roadmap'), desc: "Personalized study plan" },
   ];
 
-  const isDark = theme === "dark";
 
   return (
     <nav className="sticky top-0 z-50 h-16 border-b border-[#E2E8F0] dark:border-[#2D3748] bg-white/90 dark:bg-[#111111]/90 backdrop-blur-sm">
@@ -75,11 +74,11 @@ export function Navigation() {
               className="rounded-full border border-[#E2E8F0] dark:border-[#2D3748] px-4 py-1.5 text-sm text-[#64748B] dark:text-[#94A3B8] hover:border-[#111111] dark:hover:border-white hover:text-[#111111] dark:hover:text-white transition-colors flex items-center gap-1"
             >
               {t('features')}
-              <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${featuresOpen ? "rotate-180" : ""}`} />
+              <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-150 ${featuresOpen ? "rotate-180" : ""}`} />
             </button>
 
-            <div className={`absolute top-full left-1/2 -translate-x-1/2 mt-2 w-72 rounded-2xl bg-white dark:bg-[#1a1a1a] border border-[#E2E8F0] dark:border-[#2D3748] shadow-xl shadow-black/10 dark:shadow-black/40 z-50 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${featuresOpen ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 -translate-y-1 pointer-events-none"}`}>
-              <div className={`grid transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${featuresOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
+            <div className={`absolute top-full left-1/2 -translate-x-1/2 mt-2 w-72 rounded-2xl bg-white dark:bg-[#1a1a1a] border border-[#E2E8F0] dark:border-[#2D3748] shadow-xl shadow-black/10 dark:shadow-black/40 z-50 transition-all duration-150 ${featuresOpen ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 -translate-y-1 pointer-events-none"}`}>
+              <div className={`grid transition-all duration-150 ${featuresOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
                 <div className="overflow-hidden">
                   <div className="px-4 pt-4 pb-2">
                     <p className="text-xs font-medium text-[#94A3B8] uppercase tracking-wide">{t('allFeatures')}</p>
@@ -90,7 +89,7 @@ export function Navigation() {
                         key={f.label}
                         href={f.href}
                         onClick={() => setFeaturesOpen(false)}
-                        className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-xl hover:bg-[#F8FAFC] dark:hover:bg-[#252525] transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] group ${featuresOpen ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}`}
+                        className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-xl hover:bg-[#F8FAFC] dark:hover:bg-[#252525] transition-all duration-150 group ${featuresOpen ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}`}
                         style={{ transitionDelay: featuresOpen ? `${index * 50}ms` : "0ms" }}
                       >
                         <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg" style={{ background: `${f.color}18`, color: f.color }}>
@@ -129,11 +128,11 @@ export function Navigation() {
               className="rounded-full border border-[#E2E8F0] dark:border-[#2D3748] px-4 py-1.5 text-sm text-[#64748B] dark:text-[#94A3B8] hover:border-[#111111] dark:hover:border-white hover:text-[#111111] dark:hover:text-white transition-colors flex items-center gap-1"
             >
               {t('subjects')}
-              <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${subjectsOpen ? "rotate-180" : ""}`} />
+              <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-150 ${subjectsOpen ? "rotate-180" : ""}`} />
             </button>
 
-            <div className={`absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 rounded-2xl bg-white dark:bg-[#1a1a1a] border border-[#E2E8F0] dark:border-[#2D3748] shadow-xl shadow-black/10 dark:shadow-black/40 z-50 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${subjectsOpen ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 -translate-y-1 pointer-events-none"}`}>
-              <div className={`grid transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${subjectsOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
+            <div className={`absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 rounded-2xl bg-white dark:bg-[#1a1a1a] border border-[#E2E8F0] dark:border-[#2D3748] shadow-xl shadow-black/10 dark:shadow-black/40 z-50 transition-all duration-150 ${subjectsOpen ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 -translate-y-1 pointer-events-none"}`}>
+              <div className={`grid transition-all duration-150 ${subjectsOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
                 <div className="overflow-hidden">
                   <div className="px-4 pt-4 pb-2">
                     <p className="text-xs font-medium text-[#94A3B8] uppercase tracking-wide">{t('allSubjects')}</p>
@@ -144,7 +143,7 @@ export function Navigation() {
                         key={s.id}
                         href={`/subject/${s.id}`}
                         onClick={() => setSubjectsOpen(false)}
-                        className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-xl hover:bg-[#F8FAFC] dark:hover:bg-[#252525] transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] group ${subjectsOpen ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}`}
+                        className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-xl hover:bg-[#F8FAFC] dark:hover:bg-[#252525] transition-all duration-150 group ${subjectsOpen ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}`}
                         style={{ transitionDelay: subjectsOpen ? `${index * 50}ms` : "0ms" }}
                       >
                         <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg" style={{ background: `${s.color}18`, color: s.color }}>
@@ -187,17 +186,6 @@ export function Navigation() {
               )}
             </div>
           )}
-          {mounted && (
-            <button
-              onClick={() => setTheme(isDark ? "light" : "dark")}
-              aria-label="Toggle theme"
-              className="relative flex h-7 w-14 items-center rounded-full border border-[#E2E8F0] dark:border-[#2D3748] bg-[#F1F5F9] dark:bg-[#1A1A1A] transition-colors duration-300"
-            >
-              <span className={`absolute flex h-5 w-5 items-center justify-center rounded-full bg-white dark:bg-[#111111] shadow-sm transition-all duration-300 ${isDark ? "left-[30px]" : "left-[2px]"}`}>
-                {isDark ? <Sun className="h-3 w-3 text-[#F59E0B]" /> : <Moon className="h-3 w-3 text-[#64748B]" />}
-              </span>
-            </button>
-          )}
           <Show when="signed-out">
             <Link href="/login" className="hidden text-sm text-[#111111] dark:text-white hover:text-[#64748B] dark:hover:text-[#94A3B8] transition-colors md:block">{t('logIn')}</Link>
             <Link href="/login" className="hidden md:block">
@@ -206,14 +194,10 @@ export function Navigation() {
             <Link href="/login" className="text-sm font-semibold text-[#111111] dark:text-white md:hidden">{t('logIn')}</Link>
           </Show>
           <Show when="signed-in">
-            <Link href="/dashboard" className="hidden md:flex items-center gap-1.5 rounded-full border border-[#E2E8F0] dark:border-[#2D3748] px-4 py-1.5 text-sm text-[#64748B] dark:text-[#94A3B8] hover:border-[#111111] dark:hover:border-white hover:text-[#111111] dark:hover:text-white transition-colors">
-              {t('dashboard')}
+            <Link href="/dashboard" className="hidden md:flex items-center gap-2 rounded-full bg-[#111111] dark:bg-white px-4 py-2 text-sm font-semibold text-white dark:text-[#111111] hover:opacity-85 transition-opacity">
+              Go to Dashboard
             </Link>
-            <UserButton>
-              <UserButton.UserProfilePage label="Subscription" url="subscription" labelIcon={<CreditCard size={16} />}>
-                <SubscriptionTab />
-              </UserButton.UserProfilePage>
-            </UserButton>
+            <UserAvatar />
           </Show>
         </div>
       </div>

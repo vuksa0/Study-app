@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest, NextResponse } from "next/server";
 import mammoth from "mammoth";
+import { guardAI } from "@/lib/ai-guard";
 
 export const maxDuration = 60;
 
@@ -13,6 +14,9 @@ function isImageType(mime: string): mime is ImageMediaType {
 }
 
 export async function POST(req: NextRequest) {
+  const guard = await guardAI();
+  if (guard) return guard;
+
   const formData = await req.formData();
   const subjectId = formData.get("subjectId") as string;
   const subjectName = formData.get("subjectName") as string;

@@ -35,7 +35,7 @@ export default function PricingPage() {
     if (!isSignedIn) { router.push("/login"); return; }
     setLoading(true);
     try {
-      const res = await fetch("/api/stripe/checkout", {
+      const res = await fetch("/api/lemonsqueezy/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ plan: "plus" }),

@@ -47,11 +47,18 @@ export default async function DashboardPage() {
   const firstName = user?.firstName || user?.username || "Student";
 
   const supabase = getSupabaseAdmin();
-  const { data } = await supabase
-    .from("learn_progress")
-    .select("subject_id, course_id, lesson_id, completed_at")
-    .eq("user_id", userId)
-    .order("completed_at", { ascending: false });
+  const [{ data }, { data: prefsData }] = await Promise.all([
+    supabase
+      .from("learn_progress")
+      .select("subject_id, course_id, lesson_id, completed_at")
+      .eq("user_id", userId)
+      .order("completed_at", { ascending: false }),
+    supabase
+      .from("user_preferences")
+      .select("subjects, goal, study_style, level")
+      .eq("user_id", userId)
+      .single(),
+  ]);
 
   const records: ProgressRecord[] = data ?? [];
   const streak = computeStreak(records);
@@ -87,6 +94,9 @@ export default async function DashboardPage() {
       weeklyCompleted={weeklyCompleted}
       weeklyPct={weeklyPct}
       lastLesson={lastLesson}
+      preferredSubjects={prefsData?.subjects ?? []}
+      goal={prefsData?.goal ?? null}
+      studyStyle={prefsData?.study_style ?? null}
     />
   );
 }

@@ -3,12 +3,16 @@ import Anthropic from "@anthropic-ai/sdk";
 export const maxDuration = 60;
 import { NextRequest, NextResponse } from "next/server";
 import { getSubject, getTopic } from "@/lib/subjects";
+import { guardAI } from "@/lib/ai-guard";
 
 const client = new Anthropic();
 
 const LANGUAGES = ["Python", "JavaScript", "C++", "Java"] as const;
 
 export async function POST(req: NextRequest) {
+  const guard = await guardAI();
+  if (guard) return guard;
+
   const { subjectId, topicId, language = "Python", difficulty = "medium" } = await req.json();
 
   const lang = LANGUAGES.includes(language) ? language : "Python";

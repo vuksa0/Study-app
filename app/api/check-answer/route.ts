@@ -2,6 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 
 export const maxDuration = 60;
 import { NextRequest, NextResponse } from "next/server";
+import { guardAI } from "@/lib/ai-guard";
 
 const client = new Anthropic();
 
@@ -13,6 +14,9 @@ function isImageType(mime: string): mime is ImageMediaType {
 }
 
 export async function POST(req: NextRequest) {
+  const guard = await guardAI();
+  if (guard) return guard;
+
   const { problem, userAnswer, imageBase64, imageType } = await req.json();
 
   if (!problem) {

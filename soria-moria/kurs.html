@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kursoversikt – Soria Moria Trafikkskole</title>
+  <meta name="description" content="Se alle kurs og klasser vi tilbyr ved Soria Moria Trafikkskole. Automatik, klasse B, manuelt gir og mer." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">
+        <img src="https://s3cdn.tabs.no/skole/821/img/logo-d35cc0b0fe27d555f8a63d0026bb5be3.png?v=4.2.0" alt="Soria Moria Trafikkskole" style="height:80px; width:auto; display:block; filter: invert(1); mix-blend-mode: screen;" />
+      </a>
+      <div class="nav-links">
+        <a href="kurs.html">Kurs</a>
+        <a href="priser.html">Priser</a>
+        <a href="nyheter.html">Nyheter</a>
+        <a href="ansatte.html">Ansatte</a>
+        <a href="kontakt.html" class="btn-nav">Kontakt oss</a>
+      </div>
+      <button class="nav-toggle" aria-label="Meny">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="nav-mobile">
+      <a href="kurs.html">Kurs</a>
+      <a href="priser.html">Priser</a>
+      <a href="nyheter.html">Nyheter</a>
+      <a href="ansatte.html">Ansatte</a>
+      <a href="kontakt.html">Kontakt oss</a>
+    </div>
+  </nav>
+
+  <!-- Page Hero -->
+  <div class="page-hero">
+    <div class="container">
+      <span class="label">Opplæring</span>
+      <h1>Kursoversikt</h1>
+      <p>Vi tilbyr opplæring i flere klasser – med fokus på sikkerhet, mestring og miljø. Alle kurs kan bestilles direkte online.</p>
+    </div>
+  </div>
+
+  <!-- Filter Notice -->
+  <div style="background: #fdf0f3; border-bottom: 1px solid #f5c6d0; padding: 1rem 0;">
+    <div class="container" style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
+      <span style="font-size:0.85rem; font-weight:600; color: var(--black);">Fremhevet:</span>
+      <span style="background: var(--red); color:#fff; font-size:0.75rem; font-weight:700; padding:0.2rem 0.6rem; border-radius:3px; letter-spacing:0.06em;"> Automatik</span>
+      <span style="font-size:0.85rem; color: var(--grey);">Vi er én av få skoler i Oslo som tilbyr fullstendig opplæring på elektrisk bil.</span>
+    </div>
+  </div>
+
+  <!-- Courses -->
+  <section class="section">
+    <div class="container">
+      <div class="grid-3">
+
+        <!-- BAut – Personbil automat / Automatik -->
+        <div class="course-card fade-in">
+          <div class="course-card-header">
+            <span class="course-class">BAut</span>
+            <span class="course-badge automatik">Automatik</span>
+          </div>
+          <div class="course-card-body">
+            <h3>BAut – Personbil automat</h3>
+            <p>Opplæring på automatgir og automatik. Kjøretime fra 45 eller 60 min, med trinnvurderinger og sikkerhetskurs.</p>
+            <ul class="course-features">
+              <li>Kjøretime 45 min – 850 kr</li>
+              <li>Kjøretime 60 min – 1 100 kr</li>
+              <li>Sikkerhetskurs på bane – 6 900 kr</li>
+              <li>Sikkerhetskurs på vei – 9 800 kr</li>
+              <li>Førerprøve – 3 000 kr</li>
+            </ul>
+            <div style="display:flex; gap:0.6rem;">
+              <a href="priser.html#baut" class="btn btn-outline-red" style="flex:1; text-align:center; font-size:0.85rem;">Se priser</a>
+              <a href="kontakt.html?kurs=baut" class="btn btn-primary" style="flex:1; text-align:center; font-size:0.85rem;">Bestill time</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- B – Personbil manuell -->
+        <div class="course-card fade-in">
+          <div class="course-card-header">
+            <span class="course-class">B</span>
+            <span class="course-badge">Manuell</span>
+          </div>
+          <div class="course-card-body">
+            <h3>B – Personbil manuell</h3>
+            <p>Tradisjonell opplæring på manuelt gir med diesel. Kjøretime fra 45 eller 60 min, med trinnvurderinger og sikkerhetskurs.</p>
+            <ul class="course-features">
+              <li>Kjøretime 45 min – 950 kr</li>
+              <li>Kjøretime 60 min – 1 200 kr</li>
+              <li>Sikkerhetskurs på bane – 7 200 kr</li>
+              <li>Sikkerhetskurs på vei – 10 400 kr</li>
+              <li>Førerprøve – 2 900 kr</li>
+            </ul>
+            <div style="display:flex; gap:0.6rem;">
+              <a href="priser.html#b" class="btn btn-outline-red" style="flex:1; text-align:center; font-size:0.85rem;">Se priser</a>
+              <a href="kontakt.html?kurs=b" class="btn btn-primary" style="flex:1; text-align:center; font-size:0.85rem;">Bestill time</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- TG – Trafikalt grunnkurs -->
+        <div class="course-card fade-in">
+          <div class="course-card-header">
+            <span class="course-class">TG</span>
+          </div>
+          <div class="course-card-body">
+            <h3>TG – Trafikalt grunnkurs</h3>
+            <p>Obligatorisk kurs før du kan begynne den praktiske kjøreopplæringen. Inkluderer førstehjelp og trafikant i mørket.</p>
+            <ul class="course-features">
+              <li>Inkl. mørkedemo – 3 900 kr</li>
+              <li>Inkl. førstehjelp u/ mørkedemo – 1 900 kr</li>
+              <li>Førstehjelp 25+ år – 1 400 kr</li>
+              <li>Mørkekjøring – 2 000 kr</li>
+              <li>Minimum 6 påmeldte</li>
+            </ul>
+            <div style="display:flex; gap:0.6rem;">
+              <a href="priser.html#tg" class="btn btn-outline-red" style="flex:1; text-align:center; font-size:0.85rem;">Se priser</a>
+              <a href="kontakt.html?kurs=tg" class="btn btn-primary" style="flex:1; text-align:center; font-size:0.85rem;">Meld deg på</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="cta-banner" style="padding: 3.5rem 0;">
+    <div class="container" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:2rem;">
+      <div>
+        <h2 style="margin-bottom:0.4rem;">Usikker på hvilken klasse du trenger?</h2>
+        <p style="margin:0;">Ta kontakt med oss – vi hjelper deg å finne riktig opplæring.</p>
+      </div>
+      <a href="kontakt.html" class="btn btn-primary">Kontakt oss</a>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <h3>Soria Moria Trafikkskole</h3>
+          <p>Kulturslottet Soria Moria, Torshov, Oslo. Vi tenker grønt og tilbyr opplæring på Automatik og manuelt gir.</p>
+          <br/>
+          <span class="hiring-notice">Vi søker 1–2 lærere!</span>
+        </div>
+        <div class="footer-col">
+          <h4>Sider</h4>
+          <ul>
+            <li><a href="kurs.html">Kursoversikt</a></li>
+            <li><a href="priser.html">Klasser &amp; Priser</a></li>
+            <li><a href="nyheter.html">Nyheter</a></li>
+            <li><a href="ansatte.html">Ansatte</a></li>
+            <li><a href="kontakt.html">Kontakt oss</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Nyttige lenker</h4>
+          <ul>
+            <li><a href="https://www.vegvesen.no" target="_blank" rel="noopener">Din side (Vegvesen)</a></li>
+            <li><a href="https://www.teoritentamen.no" target="_blank" rel="noopener">Teoritentamen</a></li>
+            <li><a href="https://www.ntf.no" target="_blank" rel="noopener">Norges Trafikkskoleforbund</a></li>
+            <li><a href="https://www.facebook.com" target="_blank" rel="noopener">Facebook</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2025 Soria Moria Trafikkskole</span>
+        <span>soriaskole@soriaskole.no &nbsp;·&nbsp; 91 72 89 77</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>
